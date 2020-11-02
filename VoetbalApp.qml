@@ -11,16 +11,9 @@ App {
 	property 			VoetbalTile voetbalTile
 	property int 		i
 	property variant 	items: ["","","","","","","","","",""]
-	property string		match1 : ""
-	property string		match2 : ""
-	property string		match3 : ""
-	property string		match4 : ""
-	property string		match5 : ""
-	property string		match6 : ""
-	property string		match7 : ""
-	property string		match8 : ""
-	property string		match9 : ""
-	
+
+	signal matchesUpdated()	
+
 	function init() {
 		registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"});
 	}
@@ -98,60 +91,7 @@ App {
 								}
 	
 							}
-							if (typeof items[0] != undefined) {
-								match1= items[0]
-							}else{
-								match1= ""
-							}
-							if (typeof items[1] != undefined) {
-								match2 = items[1]
-							}else{
-								match2= ""
-							}
-							if (typeof items[2] != undefined) {
-								match3 = items[2]
-							}else{
-								match3= ""
-							}
-							if (typeof items[3] != undefined) {
-								match4 = items[3]
-							}else{
-								match4= ""
-							}
-							if (typeof items[4] != undefined) {
-								match5 = items[4]
-							}else{
-								match5= ""
-							}
-							if (typeof items[5] != undefined) {
-								match6 = items[5]
-							}else{
-								match6= ""
-							}
-							if (typeof items[6] != undefined) {
-								match7 = items[6]
-							}else{
-								match7= ""
-							}
-							if (typeof items[7] != undefined) {
-								match8 = items[7]
-							}else{
-								match8= ""
-							}
-							if (typeof items[8] != undefined) {
-								match9 = items[8]
-							}else{
-								match9= ""
-							}
-							console.log(match1)
-							console.log(match2)
-							console.log(match3)
-							console.log(match4)
-							console.log(match5)
-							console.log(match6)
-							console.log(match7)
-							console.log(match8)
-							console.log(match9)
+							matchesUpdated()
 									
 				}
 			}

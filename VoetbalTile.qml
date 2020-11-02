@@ -4,123 +4,44 @@ import qb.components 1.0
 
 Tile {
 	id: voetbalTile
-	Text {
-		id: mytext1
-		text: app.match1
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:parent.top
-			left:parent.left
-			leftMargin: 10
-		}
+
+	Component.onCompleted: {
+		app.matchesUpdated.connect(updateMatchesList);
 	}
-	Text {
-		id: mytext2
-		text: app.match2
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext1.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext3
-		text:app.match3
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext2.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext4
-		text: app.match4
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext3.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext5
-		text: app.match5
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext4.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext6
-		text: app.match6
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext5.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext7
-		text: app.match7
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext6.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext8
-		text: app.match8
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext7.bottom
-			left:mytext1.left
-			topMargin: 5
-		}
-	}
-	Text {
-		id: mytext9
-		text: app.match9
-		font {
-			family: qfont.semiBold.name
-			pixelSize: 14
-		}
-		anchors {
-			top:mytext8.bottom
-			left:mytext1.left
-			topMargin: 5
+
+	function updateMatchesList() {
+		matchModel.clear();
+		for (var i = 0; i < app.items.length; i++) {
+			if (app.items[i].length > 2) {
+				matchModel.append({match: app.items[i]});
+			}
 		}
 	}
 
+	GridView {
+		id: matchListView
+
+		model: matchModel
+		delegate: Text {
+				id: mytext
+				text: match
+				font {
+					family: qfont.semiBold.name
+					pixelSize: isNxt ? 20 : 16
+				}
+			}
+
+		flow: GridView.TopToBottom
+		cellWidth: parent.width
+		cellHeight: isNxt ? 25 : 20
+
+		anchors {
+			fill: parent
+		}
+	}
+
+	ListModel {
+		id: matchModel
+	}
 }
 
