@@ -31,6 +31,8 @@ App {
 
 	Component.onCompleted: {
 		try {
+			voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read());
+
 			selectedteams = voetbalSettingsJson['favoriteTeams'];
 		} catch(e) {
 		}
@@ -115,7 +117,8 @@ App {
 									n100 = n26;
 
 									var newscoretotal = parseInt(homescore) + parseInt(outscore);
-									
+									console.log(newscoretotal)
+									console.log(oldscoretotal[i])
 									if (oldscoretotal[i] != newscoretotal){   //new goal scored this match
 										var teamsarray = selectedteams.split(';');
 											for(var x = 0;x < teamsarray;x++){
