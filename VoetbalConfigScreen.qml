@@ -13,6 +13,7 @@ Screen {
 	onShown: {
 		addCustomTopRightButton("Save");
 		getData();
+		selectedteams = app.selectedteams;
 	}
 
 	onCustomButtonClicked: {
