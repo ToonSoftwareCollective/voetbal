@@ -8,14 +8,38 @@ App {
 
 	property url 		tileUrl : "VoetbalTile.qml"
 	property url 		thumbnailIcon: "qrc:/tsc/doorcam.png"
-	property 			VoetbalTile voetbalTile
+	property 		    VoetbalTile voetbalTile
+	property		    VoetbalConfigScreen voetbalConfigScreen
+	property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
+
 	property int 		i
 	property variant 	items: ["","","","","","","","","",""]
+	property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
+
+	property  string	selectedteams : ""
+	
+	property variant voetbalSettingsJson : {
+		'favoriteTeams': ""
+	}
 
 	signal matchesUpdated()	
+	
+	FileIO {
+		id: voetbalSettingsFile
+		source: "file:///mnt/data/tsc/voetbal_userSettings.json"
+ 	}
+
+	Component.onCompleted: {
+		try {
+			selectedteams = voetbalSettingsJson['favoriteTeams'];
+		} catch(e) {
+		}
+	}
+
 
 	function init() {
 		registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"});
+		registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen");
 	}
 
 
@@ -26,6 +50,7 @@ App {
 			if (xhr2.readyState == XMLHttpRequest.DONE) {
 				if (xhr2.status == 200) {
 							//console.log(xhr2.responseText);
+							console.log(selectedteams);
 							/*
 								<div class="match-row  match-row--status-fix"> <div class="match-row__data"><div class="match-row__status">  
 								<span class="match-row__date">01-11-20 (12:15 CET)</span> </div> 
@@ -76,7 +101,7 @@ App {
 									
 									var n20 = competitionblock.indexOf('match-row__team-name',n13) + 22;
 									var n21 = competitionblock.indexOf('</',n20);
-									var homeplayer = competitionblock.substring(n20, n21);	
+									var homeplayer = competitionblock.substring(n20, n21);
 									
 									var n25 = competitionblock.indexOf('match-row__team-name',n21) + 22;
 									var n26 = competitionblock.indexOf('</',n25);
@@ -88,18 +113,29 @@ App {
 									console.log("nummer " + i + "- " + items[i])
 									i=i+1;
 									n100 = n26;
-								}
-	
-							}
-							matchesUpdated()
+
+									var newscoretotal = parseInt(homescore) + parseInt(outscore);
 									
+									if (oldscoretotal[i] != newscoretotal){   //new goal scored this match
+										var teamsarray = selectedteams.split(';');
+											for(var x = 0;x < teamsarray;x++){
+												var teamcheck = teamsarray[x].toLowerCase();
+												var combiteam = homeplayer + outplayer;
+												if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+													console.log("Goal in favorite team")
+													////SPECIAL ACTION WHEN GOAL HERE!!!!!!
+													break;
+												}
+											}
+										oldscoretotal[i] = newscoretotal
+									}
+								}
+							}
+							matchesUpdated()		
 				}
 			}
 		}//end of xhr2.readystate
 		xhr2.send();
-		
- 
-
 	}
 	
 	Timer {
@@ -111,6 +147,13 @@ App {
 		onTriggered: {getURL();}
 	}
 
-
+	function saveSettings() {
+ 		var setJson = {
+			"favoriteTeams" : selectedteams
+		}
+  		var doc = new XMLHttpRequest();
+   		doc.open("PUT", "file:///mnt/data/tsc/voetbal_userSettings.json");
+   		doc.send(JSON.stringify(setJson));
+	}
 }
 

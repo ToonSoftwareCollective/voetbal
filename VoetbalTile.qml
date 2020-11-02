@@ -1,5 +1,6 @@
+  
 import QtQuick 2.1
-//import qb.base 1.0
+import qb.base 1.0
 import qb.components 1.0
 
 Tile {
@@ -8,6 +9,8 @@ Tile {
 	Component.onCompleted: {
 		app.matchesUpdated.connect(updateMatchesList);
 	}
+
+	
 
 	function updateMatchesList() {
 		matchModel.clear();
@@ -34,14 +37,37 @@ Tile {
 		flow: GridView.TopToBottom
 		cellWidth: parent.width
 		cellHeight: isNxt ? 25 : 20
-
+		height : parent.height - 40
+		width : parent.width
 		anchors {
-			fill: parent
+			top: parent.top
+			left: parent.left
 		}
 	}
 
 	ListModel {
 		id: matchModel
 	}
-}
 
+	NewTextLabel {
+		id: setupText
+		width: parent.width-30
+		height: isNxt ? 35 : 30
+		buttonActiveColor: "lightgrey"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  "Setup"
+		anchors {
+			bottom: parent.bottom
+			left: parent.left
+			leftMargin:15
+			bottomMargin: 5
+			}
+		onClicked: {
+			onClicked: {stage.openFullscreen(app.voetbalConfigScreenUrl)}	
+		}
+		visible: !dimState
+	}
+
+}
