@@ -8,8 +8,8 @@ App {
 
 	property url 		tileUrl : "VoetbalTile.qml"
 	property url 		thumbnailIcon: "qrc:/tsc/doorcam.png"
-	property 		VoetbalTile voetbalTile
-	property		VoetbalConfigScreen voetbalConfigScreen
+	property 			VoetbalTile voetbalTile
+	property			VoetbalConfigScreen voetbalConfigScreen
 	property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
 
 	property int 		i
@@ -85,18 +85,19 @@ App {
 							var n210 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">',n200);
 							
 							var competitionblock = xhr2.responseText.substring(n200, n210);
-							console.log("competitionblock :  "  + competitionblock);
+							//console.log("competitionblock :  "  + competitionblock);
 							i=0;
 							sizeoftilefont=20;
-							
+							calculatedfontzize-20;
+
 							while(found>1)
 							{		
 								found = competitionblock.indexOf('match-row__date', n100);
 								if (found>1){
 
-									//var n101 = competitionblock.indexOf('match-row__state', n100) + 17;
-									//var n102 = competitionblock.indexOf('</',n101);
-									//var eventstatus = competitionblock.substring(n101, n102);
+									var n101 = competitionblock.indexOf('match-row__state', n100) + 17;
+									var n102 = competitionblock.indexOf('</',n101);
+									var eventstatus = competitionblock.substring(n101, n102);
 
 									var n1 = competitionblock.indexOf('match-row__date', n100) + 17;
 									
@@ -130,21 +131,28 @@ App {
 									//items[i] = vday + "-" + vmonth + "-" + vyear + "---" + eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer;
 									items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer;
 									
-									console.log("nummer " + i + "- " + items[i])
-									sizeoftilefont = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length);
+									//console.log("nummer " + i + "- " + items[i])
+									var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length);
+
+									if (sizeoftilefont > calculatedfontzize){
+										sizeoftilefont=calculatedfontzize;
+									}
 
 									i=i+1;
 									n100 = n26;
 
 									var newscoretotal = parseInt(homescore) + parseInt(outscore);
-									console.log(newscoretotal)
-									console.log(oldscoretotal[i])
+									if (newscoretotal == 0) {oldscoretotal[i]=0}
+
 									if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
-										var teamsarray = selectedteams.split(';');
-											for(var x = 0;x < teamsarray;x++){
+									//if (oldscoretotal[i] < newscoretotal){   //new goal scored this match
+											var teamsarray = selectedteams.split(';');
+											console.log("ongelijk");
+
+											for(var x = 0;x < teamsarray.length;x++){
 												var teamcheck = teamsarray[x].toLowerCase();
 												var combiteam = homeplayer + outplayer;
-												if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+												if((combiteam.toLowerCase().indexOf(teamcheck) != -1)  && teamcheck.length > 2){
 													console.log("Goal in favorite team")
 													////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 													break;
