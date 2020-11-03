@@ -8,8 +8,8 @@ App {
 
 	property url 		tileUrl : "VoetbalTile.qml"
 	property url 		thumbnailIcon: "qrc:/tsc/doorcam.png"
-	property 		    VoetbalTile voetbalTile
-	property		    VoetbalConfigScreen voetbalConfigScreen
+	property 		VoetbalTile voetbalTile
+	property		VoetbalConfigScreen voetbalConfigScreen
 	property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
 
 	property int 		i
@@ -17,6 +17,8 @@ App {
 	property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
 
 	property  string	selectedteams : ""
+	property  int		sizeoftilefont
+
 	
 	property variant voetbalSettingsJson : {
 		'favoriteTeams': ""
@@ -54,17 +56,25 @@ App {
 							//console.log(xhr2.responseText);
 							console.log(selectedteams);
 							/*
-								<div class="match-row  match-row--status-fix"> <div class="match-row__data"><div class="match-row__status">  
-								<span class="match-row__date">01-11-20 (12:15 CET)</span> </div> 
-								<table class="match-row__teams " width="94%"> <tr> <td width="48%"> 
-								<a class="match-row__link" href="/nl/wedstrijd/heracles-almelo-v-fc-utrecht/ck7y8j64697sk0msbs66kvzoq"   > 
-								<b class="match-row__goals">0</b> </a> </td> <td rowspan="2" width="4%">-</td> <td width="48%"> 
-								<a class="match-row__link" href="/nl/wedstrijd/heracles-almelo-v-fc-utrecht/ck7y8j64697sk0msbs66kvzoq"   > 
+								div class="competition-wrapper"> 
+								<a href="/nl/keuken-kampioen-divisie/1gwajyt0pk2jm5fx5mu36v114"   class="competition-title" > 
+								<span class="competition-name">Keuken Kampioen Divisie</span> </a> 
+								</div> <div class="match-row-list">   
+								<div class="match-row  match-row--status-pla"> 
+								<div class="match-row__data"> 
+								<div class="match-row__status">  
+								<span class="match-row__state">R</span>  
+								<span class="match-row__date">03-11-20 (18:45 CET)
+								</span> </div> <table class="match-row__teams " width="94%"> <tr> <td width="48%"> 
+								<a class="match-row__link" href="/nl/wedstrijd/fc-dordrecht-v-jong-fc-utrecht/64916srq7pq9h0hn2hvjo9zze"   > 
+								<b class="match-row__goals">0</b> </a> </td> <td rowspan="2" width="4%">-</td> 
+								<td width="48%"> <a class="match-row__link" href="/nl/wedstrijd/fc-dordrecht-v-jong-fc-utrecht/64916srq7pq9h0hn2hvjo9zze"   > 
 								<b class="match-row__goals">0</b> </a> </td> </tr> <tr> <td class="match-row__team-home "> 
-								<a class="match-row__link" href="/nl/wedstrijd/heracles-almelo-v-fc-utrecht/ck7y8j64697sk0msbs66kvzoq"   > 
-								<span class="match-row__team-name">Heracles Almelo</span> </a> </td> <td class="match-row__team-away "> 
-								<a class="match-row__link" href="/nl/wedstrijd/heracles-almelo-v-fc-utrecht/ck7y8j64697sk0msbs66kvzoq"   > 
-								<span class="match-row__team-name">FC Utrecht</span> </a> </td> </tr> </table> </div>  </div>                                         
+								<a class="match-row__link" href="/nl/wedstrijd/fc-dordrecht-v-jong-fc-utrecht/64916srq7pq9h0hn2hvjo9zze"   > 
+								<span class="match-row__team-name">FC Dordrecht</span> </a> </td> <td class="match-row__team-away "> 
+								<a class="match-row__link" href="/nl/wedstrijd/fc-dordrecht-v-jong-fc-utrecht/64916srq7pq9h0hn2hvjo9zze"   > 
+								<span class="match-row__team-name">Jong FC Utrecht</span> </a> </td> </tr> </table> </div>  </div>   </div> </div>  
+								<div class="competition-matches">                                        
 							 */
 							var n100 = 1;
 							for (var i = 0; i < items.length; i++) items[i] =""
@@ -77,11 +87,17 @@ App {
 							var competitionblock = xhr2.responseText.substring(n200, n210);
 							console.log("competitionblock :  "  + competitionblock);
 							i=0;
+							sizeoftilefont=20;
 							
 							while(found>1)
 							{		
 								found = competitionblock.indexOf('match-row__date', n100);
 								if (found>1){
+
+									//var n101 = competitionblock.indexOf('match-row__state', n100) + 17;
+									//var n102 = competitionblock.indexOf('</',n101);
+									//var eventstatus = competitionblock.substring(n101, n102);
+
 									var n1 = competitionblock.indexOf('match-row__date', n100) + 17;
 									
 									var n2 = competitionblock.indexOf('(', n1) + 1;
@@ -90,6 +106,8 @@ App {
 									var vday = eventdate.substring(0, 2);
 									var vmonth = eventdate.substring(3, 6);
 									var vyear = eventdate.substring(6, 8);
+
+									
 									
 									var eventtime = competitionblock.substring(n2, n3);
 									
@@ -113,13 +131,15 @@ App {
 									items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer;
 									
 									console.log("nummer " + i + "- " + items[i])
+									sizeoftilefont = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length);
+
 									i=i+1;
 									n100 = n26;
 
 									var newscoretotal = parseInt(homescore) + parseInt(outscore);
 									console.log(newscoretotal)
 									console.log(oldscoretotal[i])
-									if (oldscoretotal[i] != newscoretotal){   //new goal scored this match
+									if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
 										var teamsarray = selectedteams.split(';');
 											for(var x = 0;x < teamsarray;x++){
 												var teamcheck = teamsarray[x].toLowerCase();

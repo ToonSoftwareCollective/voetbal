@@ -30,7 +30,7 @@ Tile {
 				text: match
 				font {
 					family: qfont.semiBold.name
-					pixelSize: isNxt ? 20 : 16
+					pixelSize: isNxt ? app.sizeoftilefont : 16
 				}
 			}
 
