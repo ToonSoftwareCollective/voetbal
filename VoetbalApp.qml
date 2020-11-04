@@ -11,6 +11,9 @@ App {
 	property 			VoetbalTile voetbalTile
 	property			VoetbalConfigScreen voetbalConfigScreen
 	property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
+	
+	property			VoetbalScreen voetbalScreen
+	property url 		voetbalScreenUrl : "VoetbalScreen.qml"
 
 	property int 		i
 	property variant 	items: ["","","","","","","","","",""]
@@ -18,7 +21,11 @@ App {
 
 	property  string	selectedteams : ""
 	property  int		sizeoftilefont
-
+	
+	property  string	firstlinescreentext : ""
+	property  string	secondlinescreentext : ""
+	
+	property bool goaltimerrunning : false
 	
 	property variant voetbalSettingsJson : {
 		'favoriteTeams': ""
@@ -33,17 +40,17 @@ App {
 
 	Component.onCompleted: {
 		try {
-			voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read());
-
-			selectedteams = voetbalSettingsJson['favoriteTeams'];
+			voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
+			selectedteams = voetbalSettingsJson['favoriteTeams']
 		} catch(e) {
 		}
 	}
 
 
 	function init() {
-		registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"});
-		registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen");
+		registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"})
+		registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen")
+		registry.registerWidget("screen", voetbalScreenUrl, this, "voetbalScreen")
 	}
 
 
@@ -53,8 +60,6 @@ App {
 		xhr2.onreadystatechange = function() {
 			if (xhr2.readyState == XMLHttpRequest.DONE) {
 				if (xhr2.status == 200) {
-							//console.log(xhr2.responseText);
-							console.log(selectedteams);
 							/*
 								div class="competition-wrapper"> 
 								<a href="/nl/keuken-kampioen-divisie/1gwajyt0pk2jm5fx5mu36v114"   class="competition-title" > 
@@ -76,85 +81,87 @@ App {
 								<span class="match-row__team-name">Jong FC Utrecht</span> </a> </td> </tr> </table> </div>  </div>   </div> </div>  
 								<div class="competition-matches">                                        
 							 */
-							var n100 = 1;
-							for (var i = 0; i < items.length; i++) items[i] =""
+							var n100 = 1
+							for (var i = 0; i < items.length; i++) items[i] =""  //clear array
 
-							var found = 2;
-						
-							var n200 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">') + 1;
-							var n210 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">',n200);
-							
-							var competitionblock = xhr2.responseText.substring(n200, n210);
-							//console.log("competitionblock :  "  + competitionblock);
-							i=0;
-							sizeoftilefont=20;
-							calculatedfontzize-20;
+							var found = 2
+							var n200 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">') + 1
+							var n210 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">',n200)
+							var competitionblock = xhr2.responseText.substring(n200, n210)
+							//console.log("competitionblock :  "  + competitionblock)
+							i=0
+							sizeoftilefont=20
+							calculatedfontzize-20
 
 							while(found>1)
 							{		
-								found = competitionblock.indexOf('match-row__date', n100);
+								found = competitionblock.indexOf('match-row__date', n100)
 								if (found>1){
 
-									var n101 = competitionblock.indexOf('match-row__state', n100) + 17;
-									var n102 = competitionblock.indexOf('</',n101);
-									var eventstatus = competitionblock.substring(n101, n102);
+									var n101 = competitionblock.indexOf('match-row__state', n100) + 17
+									var n102 = competitionblock.indexOf('</',n101)
+									var eventstatus = competitionblock.substring(n101, n102)
 
-									var n1 = competitionblock.indexOf('match-row__date', n100) + 17;
+									var n1 = competitionblock.indexOf('match-row__date', n100) + 17
 									
-									var n2 = competitionblock.indexOf('(', n1) + 1;
-									var n3 = competitionblock.indexOf('CET',n2);
-									var eventdate = competitionblock.substring(n1, n2);
-									var vday = eventdate.substring(0, 2);
-									var vmonth = eventdate.substring(3, 6);
-									var vyear = eventdate.substring(6, 8);
-
+									var n2 = competitionblock.indexOf('(', n1) + 1
+									var n3 = competitionblock.indexOf('CET',n2)
+									var eventdate = competitionblock.substring(n1, n2)
+									var vday = eventdate.substring(0, 2)
+									var vmonth = eventdate.substring(3, 6)
+									var vyear = eventdate.substring(6, 8)
+									var eventtime = competitionblock.substring(n2, n3)
 									
+									var n10 = competitionblock.indexOf('match-row__goals',n3) + 18
+									var n11 = competitionblock.indexOf('</',n10)
+									var homescore = competitionblock.substring(n10, n11)	
 									
-									var eventtime = competitionblock.substring(n2, n3);
+									var n13 = competitionblock.indexOf('match-row__goals',n11) + 18
+									var n14 = competitionblock.indexOf('</',n13)
+									var outscore = competitionblock.substring(n13, n14)	
 									
-									var n10 = competitionblock.indexOf('match-row__goals',n3) + 18;
-									var n11 = competitionblock.indexOf('</',n10);
-									var homescore = competitionblock.substring(n10, n11);	
+									var n20 = competitionblock.indexOf('match-row__team-name',n13) + 22
+									var n21 = competitionblock.indexOf('</',n20)
+									var homeplayer = competitionblock.substring(n20, n21)
 									
-									var n13 = competitionblock.indexOf('match-row__goals',n11) + 18;
-									var n14 = competitionblock.indexOf('</',n13);
-									var outscore = competitionblock.substring(n13, n14);	
+									var n25 = competitionblock.indexOf('match-row__team-name',n21) + 22
+									var n26 = competitionblock.indexOf('</',n25)
+									var outplayer = competitionblock.substring(n25, n26)
 									
-									var n20 = competitionblock.indexOf('match-row__team-name',n13) + 22;
-									var n21 = competitionblock.indexOf('</',n20);
-									var homeplayer = competitionblock.substring(n20, n21);
+									items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 									
-									var n25 = competitionblock.indexOf('match-row__team-name',n21) + 22;
-									var n26 = competitionblock.indexOf('</',n25);
-									var outplayer = competitionblock.substring(n25, n26);
-									
-									//items[i] = vday + "-" + vmonth + "-" + vyear + "---" + eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer;
-									items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer;
-									
-									//console.log("nummer " + i + "- " + items[i])
-									var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length);
+									var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length)
 
 									if (sizeoftilefont > calculatedfontzize){
-										sizeoftilefont=calculatedfontzize;
+										sizeoftilefont=calculatedfontzize
 									}
+									
+									i=i+1
+									n100 = n26
 
-									i=i+1;
-									n100 = n26;
-
-									var newscoretotal = parseInt(homescore) + parseInt(outscore);
+									var newscoretotal = parseInt(homescore) + parseInt(outscore)
 									if (newscoretotal == 0) {oldscoretotal[i]=0}
 
 									if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
-									//if (oldscoretotal[i] < newscoretotal){   //new goal scored this match
-											var teamsarray = selectedteams.split(';');
-											console.log("ongelijk");
+											var teamsarray = selectedteams.split(';')
+											console.log("ongelijk")
 
 											for(var x = 0;x < teamsarray.length;x++){
-												var teamcheck = teamsarray[x].toLowerCase();
-												var combiteam = homeplayer + outplayer;
+												var teamcheck = teamsarray[x].toLowerCase()
+												var combiteam = homeplayer + outplayer
 												if((combiteam.toLowerCase().indexOf(teamcheck) != -1)  && teamcheck.length > 2){
 													console.log("Goal in favorite team")
+													
+													///////////////////////////////////////
 													////SPECIAL ACTION WHEN GOAL HERE!!!!!!
+													
+														firstlinescreentext : homeplayer + " - " + outplayer
+														secondlinescreentext : homescore + " - " + outscore
+														goaltimerrunning = true
+														voetbalScreen.show()
+
+													///////////////////////////////////////
+													
 													break;
 												}
 											}
@@ -166,7 +173,7 @@ App {
 				}
 			}
 		}//end of xhr2.readystate
-		xhr2.send();
+		xhr2.send()
 	}
 	
 	Timer {
@@ -175,16 +182,27 @@ App {
 		repeat: true
 		running: true
 		triggeredOnStart: true
-		onTriggered: {getURL();}
+		onTriggered: {getURL()}
+	}
+	
+	Timer {
+		id: goalTimer
+		interval: 10000   //10 second screen when goal
+		repeat: false
+		running: goaltimerrunning
+		triggeredOnStart: true
+		onTriggered: {
+				voetbalScreen.hide()
+		}
 	}
 
 	function saveSettings() {
  		var setJson = {
 			"favoriteTeams" : selectedteams
 		}
-  		var doc = new XMLHttpRequest();
-   		doc.open("PUT", "file:///mnt/data/tsc/voetbal_userSettings.json");
-   		doc.send(JSON.stringify(setJson));
+  		var doc = new XMLHttpRequest()
+   		doc.open("PUT", "file:///mnt/data/tsc/voetbal_userSettings.json")
+   		doc.send(JSON.stringify(setJson))
 	}
 }
 

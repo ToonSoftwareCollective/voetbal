@@ -10,8 +10,6 @@ Tile {
 		app.matchesUpdated.connect(updateMatchesList);
 	}
 
-	
-
 	function updateMatchesList() {
 		matchModel.clear();
 		for (var i = 0; i < app.items.length; i++) {
@@ -36,7 +34,7 @@ Tile {
 
 		flow: GridView.TopToBottom
 		cellWidth: parent.width
-		cellHeight: isNxt ? 25 : 20
+		cellHeight: isNxt ? parseInt(180/app.items.length) : parseInt(150/app.items.length)
 		height : parent.height - 40
 		width : parent.width
 		anchors {

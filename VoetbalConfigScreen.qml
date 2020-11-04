@@ -4,15 +4,17 @@ import qb.components 1.0
 
 Screen {
 	id: voetbalConfigScreen
-	screenTitle: "Voetbal app Setup"
+	screenTitle: "Voetbal App Setup"
 
-	property variant   teams: ["ADO","Ajax","AZ","Emmen","Groningen","Twente","Utrecht","Feyenoord","Fortuna","Heracles","PEC","PSV","RKC","Heerenveen","Sparta","Vitesse","VVV","Willem"]
+	property string teams: ""
+	property string teamsURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/master/teamnames.txt"
+	property variant   teamsShort : []
 	property int  numberofItems :0
 	property string  selectedteams : ""
 	
 	onShown: {
 		addCustomTopRightButton("Save");
-		getData();
+		getTeams();
 		selectedteams = app.selectedteams;
 	}
 
@@ -22,28 +24,71 @@ Screen {
 		hide();
 	}
 
-	function getData() {
-		numberofItems =  teams.length
-		model.clear()
-		for (var i = 0; i < teams.length; i++){
-			listview1.model.append({name: teams[i]})
+	function getTeams(){
+		var xmlhttp = new XMLHttpRequest()
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+				teams = xmlhttp.responseText
+				var teamsArray = teams.substring(1, teams.length-1).split(';')
+				numberofItems =  teamsArray.length
+				model.clear()
+				for(var x1 = 0;x1 < teamsArray.length;x1++){
+						var team = teamsArray[x1]
+						var teamArray= team.split(':')
+						listview1.model.append({name: teamArray[0]}) // long teamnames to listview
+						teamsShort.push(teamArray[1]) //short teamnames to array
+				}
+			}
 		}
+		xmlhttp.open("GET", teamsURL, true)
+		xmlhttp.send()
 	}
 
 /////////////////////////////////////////////////////////////////////////
+
+	Text {
+		id: mytexttop1
+		text: "Select your favorite teams."
+
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 20 : 16
+		}
+		anchors {
+			top:parent.top
+			left:parent.left
+			leftMargin: 10
+			topMargin: 10
+		}
+	}
+	
+	Text {
+		id: mytexttop2
+		text: "When a goal is scored in a match of your selected team(s) you will get a notification"
+
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 20 : 16
+		}
+		anchors {
+			top:		mytexttop1.bottom
+			topMargin: 	5
+			left:   	mytexttop1.left
+		}
+	}
+	
 	Rectangle{
 		id: listviewContainer
-		width: isNxt ? 240 : 188
+		width: isNxt ? 300 : 240
 		height: isNxt ? 300 : 200
 		color: "white"
 		radius: isNxt ? 5 : 4
 		border.color: "black"
 			border.width: isNxt ? 5 : 4
 		anchors {
-			top:		parent.top
-			topMargin: 	50
-			left:   	parent.left
-			leftMargin:	20
+			top:		mytexttop2.bottom
+			topMargin: 	20
+			left:   	mytexttop1.left
 		}
 
 		Component {
@@ -54,11 +99,10 @@ Screen {
 				Text {
 					id: tst
 					text: name
-					font.pixelSize: isNxt ? 22 : 17
+					font.pixelSize: isNxt ? 20 : 16
 				}
 			}
 		}
-
 
 		ListModel {
 				id: model
@@ -82,14 +126,20 @@ Screen {
 				radius: isNxt ? 5 : 4
 			}
 			focus: true
-			MouseArea {
+			/*MouseArea {
 				anchors.fill: parent
 				onClicked: {
-				animation(model.get(listview1.currentIndex).name);
+				if (selectedteams.indexOf(teamsShort[listview1.currentIndex]) == -1){
+					if  (selectedteams.length<1){
+						selectedteams += teamsShort[listview1.currentIndex]
+					}else{
+						selectedteams += ";" + teamsShort[listview1.currentIndex]
+					}
+				}
 				}
 			}
+			*/
 		}
-		visible: !dimState
 	}
 
 /////////////////////////////////////////////////////////////////////////
@@ -105,10 +155,9 @@ Screen {
 		iconSource: "qrc:/tsc/up.png"
 		onClicked: {
 		    if (listview1.currentIndex>0){
-                        listview1.currentIndex  = listview1.currentIndex -1;
+                        listview1.currentIndex  = listview1.currentIndex -1
             }
 		}	
-		visible: !dimState
 	}
 
 	IconButton {
@@ -123,10 +172,9 @@ Screen {
 		iconSource: "qrc:/tsc/down.png"
 		onClicked: {
 		    if (numberofItems>=listview1.currentIndex){
-                        listview1.currentIndex  = listview1.currentIndex +1;
+                        listview1.currentIndex  = listview1.currentIndex +1
             }
 		}	
-		visible: !dimState
 	}
 
 
@@ -134,7 +182,7 @@ Screen {
 		id: addText
 		width: isNxt ? 95 : 65;  
 		height: isNxt ? 35 : 30
-		buttonActiveColor: "lightgrey"
+		buttonActiveColor: "lightgreen"
 		buttonHoverColor: "blue"
 		enabled : true
 		textColor : "black"
@@ -145,48 +193,45 @@ Screen {
 			topMargin: 10
 			}
 		onClicked: {
-			console.log(model.get(listview1.currentIndex).name);
-			if  (selectedteams.length<1){
-				selectedteams = model.get(listview1.currentIndex).name;
-			}else{
-				selectedteams += ";" + model.get(listview1.currentIndex).name;
+			if (selectedteams.indexOf(teamsShort[listview1.currentIndex]) == -1){
+				if  (selectedteams.length<1){
+					selectedteams += teamsShort[listview1.currentIndex]
+				}else{
+					selectedteams += ";" + teamsShort[listview1.currentIndex]
+				}
 			}
 		}
-		visible: !dimState
 	}
 
 	NewTextLabel {
 		id: clearText
 		width: isNxt ? 95 : 65;  
 		height: isNxt ? 35 : 30
-		buttonActiveColor: "lightgrey"
+		buttonActiveColor: "red"
 		buttonHoverColor: "blue"
 		enabled : true
 		textColor : "black"
 		buttonText:  "Clear"
 		anchors {
-			top: listviewContainer.bottom
-			left: addText.right
-			leftMargin:10
-			topMargin: 10
+			top: addText.top
+			right: listviewContainer.right
 			}
 		onClicked: {
-			selectedteams= "";
+			selectedteams= ""
 		}
-		visible: !dimState
 	}
 
 	Text {
 		id: mytext1
-		text: "Selected Teams: " + selectedteams
+		text: "Selected Teams (shortnames): " + selectedteams
 
 		font {
 			family: qfont.semiBold.name
-			pixelSize: isNxt ? 22 : 17
+			pixelSize: isNxt ? 20 : 16
 		}
 		anchors {
 			top:clearText.bottom
-			left:listviewContainer.bottom
+			left:listviewContainer.left
 			leftMargin: 0
 			topMargin: 10
 		}
