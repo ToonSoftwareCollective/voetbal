@@ -93,7 +93,7 @@ App {
 							sizeoftilefont=20
 							calculatedfontzize-20
 
-							while(found>1)
+							while ((found>1)&& (i<9)){ //max 9 wedstrijden	
 							{		
 								found = competitionblock.indexOf('match-row__date', n100)
 								if (found>1){
