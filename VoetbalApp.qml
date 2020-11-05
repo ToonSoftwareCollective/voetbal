@@ -2,17 +2,18 @@ import QtQuick 2.1
 import qb.components 1.0
 import qb.base 1.0;
 import FileIO 1.0
+import BxtClient 1.0
 
 App {
 	id: voetbalApp
 
 	property url 		tileUrl : "VoetbalTile.qml"
 	property url 		thumbnailIcon: "qrc:/tsc/doorcam.png"
-	property 			VoetbalTile voetbalTile
-	property			VoetbalConfigScreen voetbalConfigScreen
+	property 		    VoetbalTile voetbalTile
+	property		    VoetbalConfigScreen voetbalConfigScreen
 	property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
 	
-	property			VoetbalScreen voetbalScreen
+	property		    VoetbalScreen voetbalScreen
 	property url 		voetbalScreenUrl : "VoetbalScreen.qml"
 
 	property int 		i
@@ -20,15 +21,19 @@ App {
 	property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
 
 	property  string	selectedteams : ""
+	property  string    selectedlampsbyuuid : ""
+	property  string    selectedlampsbyname  : ""
 	property  int		sizeoftilefont
 	
-	property  string	firstlinescreentext : ""
-	property  string	secondlinescreentext : ""
+	property  string	firstlinescreentext : "skjfdsjkfjk - sdfhsdjhfjsdhfj"
+	property  string	secondlinescreentext : "0 - 1"
 	
 	property bool goaltimerrunning : false
 	
 	property variant voetbalSettingsJson : {
-		'favoriteTeams': ""
+		'favoriteTeams': "",
+		'favoriteLampUUID': "",
+		'favoriteLampName': ""
 	}
 
 	signal matchesUpdated()	
@@ -42,6 +47,8 @@ App {
 		try {
 			voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
 			selectedteams = voetbalSettingsJson['favoriteTeams']
+			selectedlampsbyuuid = voetbalSettingsJson['favoriteLampUUID']
+			selectedlampsbyname = voetbalSettingsJson['favoriteLampName']
 		} catch(e) {
 		}
 	}
@@ -94,7 +101,6 @@ App {
 							calculatedfontzize-20
 
 							while ((found>1)&& (i<9)){ //max 9 wedstrijden	
-							{		
 								found = competitionblock.indexOf('match-row__date', n100)
 								if (found>1){
 
@@ -130,8 +136,8 @@ App {
 									
 									items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 									
-									var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length)
 
+									var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length)
 									if (sizeoftilefont > calculatedfontzize){
 										sizeoftilefont=calculatedfontzize
 									}
@@ -157,9 +163,16 @@ App {
 													
 														firstlinescreentext : homeplayer + " - " + outplayer
 														secondlinescreentext : homescore + " - " + outscore
+														///mnt/data/tsc/     ----<<< stuur daarnaartoe zodat de animatie op kan halen
 														goaltimerrunning = true
 														voetbalScreen.show()
-
+														
+														if(app.selectedlampsbyuuid.length>0){
+															console.log("lamps blinking")
+															lampblinkTimer.running = true
+															lampTimer.running = true
+														}
+														
 													///////////////////////////////////////
 													
 													break;
@@ -196,9 +209,40 @@ App {
 		}
 	}
 
+	Timer {
+		id: lampblinkTimer
+		interval: 300   //10 second screen when goal
+		repeat: true
+		running: false
+		triggeredOnStart: false
+		onTriggered: {
+				var lampsarray = selectedlampsbyuuid.split(';')
+				for(var x1 = 0;x1 < selectedlampsbyuuid.length;x1++){
+					console.log("Going to switch item " + lampsarray[x1]);
+					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, lampsarray[x1] , "SwitchPower", "SetTarget");
+					msg.addArgument("NewTargetValue", lampstate? "0": "1");
+					bxtClient.sendMsg(msg);
+				}
+				lampstate = !lampstate
+		}
+	}
+
+	Timer {
+		id: lampTimer
+		interval: 4500   //5 second screen when goal
+		repeat: false
+		running: false
+		triggeredOnStart: false
+		onTriggered: {
+				lampblinkTimer.running = false
+		}
+	}
+	
 	function saveSettings() {
  		var setJson = {
-			"favoriteTeams" : selectedteams
+			"favoriteTeams" : selectedteams,
+			"favoriteLampUUID" : selectedlampsbyuuid,
+			"favoriteLampName" : selectedlampsbyname
 		}
   		var doc = new XMLHttpRequest()
    		doc.open("PUT", "file:///mnt/data/tsc/voetbal_userSettings.json")
