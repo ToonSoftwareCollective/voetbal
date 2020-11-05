@@ -54,7 +54,7 @@ Tile {
 
 	NewTextLabel {
 		id: setupText
-		width: parent.width-60
+		width: parent.width-30
 		height: isNxt ? 35 : 30
 		buttonActiveColor: "lightgrey"
 		buttonHoverColor: "blue"
@@ -64,7 +64,7 @@ Tile {
 		anchors {
 			bottom: parent.bottom
 			left: parent.left
-			leftMargin:0
+			leftMargin:15
 			bottomMargin: 5
 			}
 		onClicked: {
@@ -72,29 +72,5 @@ Tile {
 		}
 		visible: !dimState
 	}
-	NewTextLabel {
-		id: animText
-		width: 40
-		height: isNxt ? 35 : 30
-		buttonActiveColor: "lightgrey"
-		buttonHoverColor: "blue"
-		enabled : true
-		textColor : "black"
-		buttonText:  "Ani"
-		anchors {
-			bottom: parent.bottom
-			right: parent.right
-			rightMargin:0
-			bottomMargin: 5
-			}
-		onClicked: {						
-				animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
-				animationscreen.animationInterval= isNxt ? 100000 : 100000
-				animationscreen.isVisibleinDimState= true	
-				animationscreen.animationRunning= true;		
-		}
-		visible: !dimState
-	}
-	
 	
 }
