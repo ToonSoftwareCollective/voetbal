@@ -5,7 +5,6 @@ import BasicUIControls 1.0
 import qb.components 1.0
 import BxtClient 1.0
 
-
 Tile {
 	id: voetbalTile
 	
