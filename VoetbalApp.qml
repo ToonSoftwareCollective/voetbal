@@ -43,6 +43,8 @@ App {
 			'SceneUUID': "",
 			'SceneName': ""
 		}
+		property bool lampstate: false
+
 
 		signal matchesUpdated()	
 		

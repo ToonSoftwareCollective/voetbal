@@ -39,6 +39,8 @@ Screen {
 		selectedscenebyname = app.selectedscenebyname
 		notificationtime = app.notificationtime
 		bridgeuuid = app.bridgeuuid
+
+		console.log ("selectedlampsbyname: " + selectedlampsbyname)
 	}
 
 	onCustomButtonClicked: {
@@ -92,12 +94,8 @@ Screen {
 									var n20 = lampsArray[x0].indexOf('<uuid>') + 6
 									var n21 = lampsArray[x0].indexOf('</uuid>',n21)
 									bridgeuuid = lampsArray[x0].substring(n20, n21)
-								}else{													//no bridge found so no lamps, no scenes
-									selectedlampsbyuuid = ""
-									selectedlampsbyname = ""
-									selectedscenebyuuid = ""
-									selectedscenebyname = ""
 								}
+
 						}
 						for(var x1 = 0;x1 < lampsArray.length;x1++){
 							var found = 2
@@ -116,7 +114,6 @@ Screen {
 						}
 						for(var x2 = 0;x2 < lampsArray.length;x2++){
 							var found2 = 2
-							console.log(lampsArray)
 							found2 = lampsArray[x2].indexOf('<type>hue_scene')
 								if (found2>1){
 									numberofscenes = numberofscenes + 1
@@ -130,8 +127,16 @@ Screen {
 									scenesUUID.push(uuid) //scene uuids to array
 								}
 						}
+						if (bridgeuuid.lenght<105){//no bridge found so no lamps, no scenes
+							bridgefound=false
+							selectedlampsbyuuid = ""
+							selectedlampsbyname = ""
+							selectedscenebyuuid = ""
+							selectedscenebyname = ""
+						}
 
             		}
+					
         	}
         	doc.open("GET", "file:////qmf/config/config_hdrv_hue.xml", true);
         	doc.setRequestHeader("Content-Encoding", "UTF-8");
