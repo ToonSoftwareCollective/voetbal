@@ -343,7 +343,7 @@ App {
 					bxtClient.sendMsg(msg)
 				}
 				restorelamps()
-				lampTimer.running: false
+				lampTimer.running = false
 			}
 		}
 		
