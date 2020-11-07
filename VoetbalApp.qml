@@ -157,7 +157,7 @@ App {
 												items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 												
 
-												var calculatedfontzize = isNxt? parseInt(600/items[i].length):parseInt(500/items[i].length)
+												var calculatedfontzize = isNxt? parseInt(590/items[i].length):parseInt(500/items[i].length)
 												if (sizeoftilefont > calculatedfontzize){
 													sizeoftilefont=calculatedfontzize
 												}
@@ -184,7 +184,7 @@ App {
 																		"score" : homescore + " - " + outscore
 																	}
 																	var doc = new XMLHttpRequest()
-																	doc.open("PUT", "file:////HCBv2/qml/apps/voetbal/newScore.json")
+																	doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
 																	doc.send(JSON.stringify(setJson))
 																	
 																	oldlampstatus = lampstatus
