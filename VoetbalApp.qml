@@ -335,14 +335,15 @@ App {
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
-			lampblinkTimer.running = false
+				running: false
+				lampblinkTimer.running = false
 				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
 					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
 					msg.addArgument("scene", 0)
 					bxtClient.sendMsg(msg)
 				}
 				restorelamps()
-
+				lampTimer.running: false
 			}
 		}
 		
@@ -361,4 +362,3 @@ App {
 			doc.send(JSON.stringify(setJson))
 		}
 	}
-
