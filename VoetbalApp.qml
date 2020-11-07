@@ -258,7 +258,7 @@ App {
 		BxtDiscoveryHandler {
 			id: smartplugDiscoHandler
 			deviceType: "happ_smartplug"
-			onDiscoReceived: smartplugUuid = deviceUuid
+			//onDiscoReceived: smartplugUuid = deviceUuid
 		}
 
 
