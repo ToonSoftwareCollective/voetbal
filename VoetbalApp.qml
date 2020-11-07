@@ -179,13 +179,15 @@ App {
 																///////////////////////////////////////
 																////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																
-																	var setJson = {
-																		"teams" : homeplayer + " - " + outplayer,
-																		"score" : homescore + " - " + outscore
-																	}
-																	var doc = new XMLHttpRequest()
-																	doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
-																	doc.send(JSON.stringify(setJson))
+																	var str1 = "{\"teams\" : \"";
+																	var str2 = homeplayer + " - " + outplayer;
+																	var str3 = "\", \"score\":\"";
+																	var str4 = homescore + " - " + outscore;
+																	var str5 = "\"}";
+																	var res = str1.concat(str2, str3, str4, str5);
+																	var doc2 = new XMLHttpRequest();
+																	doc2.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json");
+																	doc2.send(res);
 																	
 																	oldlampstatus = lampstatus
 																	
@@ -194,9 +196,10 @@ App {
 																			var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
 																			msg.addArgument("scene",  parseInt(selectedscenebyuuid));
 																			bxtClient.sendMsg(msg);
+																			console.log("Blinking started");
 																		}
 																		lampblinkTimer.running = true
-																		lampTimer.running = true
+																		//lampTimer.running = true
 																	}
 																	
 																	animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
@@ -308,6 +311,7 @@ App {
 					bxtClient.sendMsg(msg)
 				}
 				restorelamps()
+				goalTimer.running = false
 			}
 		}
 
@@ -324,18 +328,20 @@ App {
 						msg.addArgument("NewTargetValue", lampstate? "0": "1");
 						bxtClient.sendMsg(msg);
 					}
+					if (lampstate){
+						console.log("Blink On");
+						}
 					lampstate = !lampstate
 			}
 		}
 
 		Timer {
 			id: lampTimer   //delay to stop blinking lamps
-			interval: 4500  
+			interval: 6000  
 			repeat: false
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
-				running: false
 				lampblinkTimer.running = false
 				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
 					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
@@ -362,4 +368,3 @@ App {
 			doc.send(JSON.stringify(setJson))
 		}
 	}
-
