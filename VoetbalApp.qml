@@ -12,13 +12,16 @@ App {
 		property 		    VoetbalTile voetbalTile
 		property		    VoetbalConfigScreen voetbalConfigScreen
 		property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
-		
-		property		    VoetbalScreen voetbalScreen
-		property url 		voetbalScreenUrl : "VoetbalScreen.qml"
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
 		property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
+		
+		property variant 	deviceStatusInfo: ({})
+		property variant 	hueScenes: []
+		property variant 	lampstatus: []
+		property variant 	oldlampstatus: []
+		
 
 		property  string	selectedteams : ""
 		property  string    selectedlampsbyuuid : ""
@@ -71,7 +74,6 @@ App {
 		function init() {
 			registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"})
 			registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen")
-			registry.registerWidget("screen", voetbalScreenUrl, this, "voetbalScreen")
 		}
 
 
@@ -182,8 +184,10 @@ App {
 																		"score" : homescore + " - " + outscore
 																	}
 																	var doc = new XMLHttpRequest()
-																	doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
+																	doc.open("PUT", "file:////HCBv2/qml/apps/voetbal/newScore.json")
 																	doc.send(JSON.stringify(setJson))
+																	
+																	oldlampstatus = lampstatus
 																	
 																	if(selectedlampsbyuuid.length>0){
 																		if (selectedscenebyuuid.length>0) //select new special scene
@@ -217,6 +221,68 @@ App {
 			xhr2.send()
 		}
 		
+		function getLampStates(update){
+			for (var i = 0; i < lampstatus.length; i++) items[i] =""  //clear array
+			x = 0
+			var infoList = deviceStatusInfo;
+			var infoNode = update.getChild("device", 0);
+			while (infoNode && infoNode.name === "device") {
+				var uuidNode = infoNode.getChild("DevUUID");
+				var device = infoList[uuidNode.text];
+				if (!device)
+					device = {};
+					var childNode = infoNode.child;
+					while (childNode) {
+						//console.log("childNode.name " + childNode.name);
+						if (childNode.name == "DevUUID"){
+							var lampname = childNode.text;
+						}
+						if (childNode.name == "CurrentState"){
+							var lamponoff = childNode.text;
+							lampstatus[x] = lampname + ":" + lamponoff;
+							x = x + 1
+						}
+						//console.log("childNode.text " + childNode.text);
+						childNode = childNode.sibling;
+					}
+				infoList[uuidNode.text] = device;
+				infoNode = infoNode.next;
+			}
+			deviceStatusInfo = infoList;
+			for(var xx = 0;xx < lampstatus.length;xx++){
+					//console.log(lampstatus[xx])
+			}
+		}
+		
+		
+		BxtDiscoveryHandler {
+			id: smartplugDiscoHandler
+			deviceType: "happ_smartplug"
+			onDiscoReceived: smartplugUuid = deviceUuid
+		}
+
+
+		BxtDatasetHandler {
+			id: deviceStatusInfoDataset
+			dataset: "deviceStatusInfo"
+			discoHandler: smartplugDiscoHandler
+			onDatasetUpdate: getLampStates(update)
+		}
+		
+		function restorelamps(){
+			console.log("Restoring lamps to old status")
+			for (var i = 0; i < oldlampstatus.length; i++){
+				var lamp1 = oldlampstatus[i]
+				var lampArray=lamp1.split(':')
+						console.log("Restoring lamp " + lampArray[0] + " to old status")
+						console.log(lampArray[0])
+						console.log(lampArray[1])	
+						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, lampArray[0] , "SwitchPower", "SetTarget");
+						msg.addArgument("NewTargetValue", (parseInt(lampstate) == 0)? "0": "1");
+						bxtClient.sendMsg(msg);
+			}
+		}
+		
 		Timer {
 			id: voetbalTimer   //interval to scrape data
 			interval: 10000
@@ -234,7 +300,14 @@ App {
 			triggeredOnStart: false
 			onTriggered: {
 				animationscreen.animationRunning= false;
-				animationscreen.isVisibleinDimState= false;
+				animationscreen.isVisibleinDimState= false;			
+				lampblinkTimer.running = false
+				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
+					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
+					msg.addArgument("scene", 0)
+					bxtClient.sendMsg(msg)
+				}
+				restorelamps()
 			}
 		}
 
@@ -262,12 +335,14 @@ App {
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
-					lampblinkTimer.running = false
-					if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
-						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
-						msg.addArgument("scene", 0)
-						bxtClient.sendMsg(msg)
-					}
+			lampblinkTimer.running = false
+				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
+					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
+					msg.addArgument("scene", 0)
+					bxtClient.sendMsg(msg)
+				}
+				restorelamps()
+
 			}
 		}
 		
