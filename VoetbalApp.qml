@@ -169,9 +169,9 @@ App {
 												if (newscoretotal == 0) {oldscoretotal[i]=0}
 
 												if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
+														
+														console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 														var teamsarray = selectedteams.split(';')
-														console.log("ongelijk")
-
 														for(var x = 0;x < teamsarray.length;x++){
 															var teamcheck = teamsarray[x].toLowerCase()
 															var combiteam = homeplayer + outplayer
@@ -362,3 +362,4 @@ App {
 			doc.send(JSON.stringify(setJson))
 		}
 	}
+
