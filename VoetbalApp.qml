@@ -175,7 +175,7 @@ App {
 														for(var x = 0;x < teamsarray.length;x++){
 															var teamcheck = teamsarray[x].toLowerCase()
 															var combiteam = homeplayer + outplayer
-															if((combiteam.toLowerCase().indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+															if((combiteam.toLowerCase().indexOf(teamcheck.toLowerCase()) != -1)  && teamcheck.length > 2){
 																///////////////////////////////////////
 																////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																
