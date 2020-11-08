@@ -31,6 +31,8 @@ App {
 		property  string 	bridgeuuid
 		property  int		sizeoftilefont
 		property  int		notificationtime: 10000
+		
+		property bool		isFirstRun: true
 
 		property  string	firstlinescreentext : "skjfdsjkfjk - sdfhsdjhfjsdhfj"
 		property  string	secondlinescreentext : "0 - 1"
@@ -80,11 +82,13 @@ App {
 		function getURL() {
 			var xhr2 = new XMLHttpRequest();
 			xhr2.open("GET", "https://www.goal.com/nl/live-scores", true); //check the feeds from the webpage
+			//xhr2.open("GET", "http://oepiloepi.eu/competitie.html", true); //check the feeds from the webpage
 			xhr2.onreadystatechange = function() {
 				if (xhr2.readyState == XMLHttpRequest.DONE) {
 					if (xhr2.status == 200) {
+								//console.log("responsetext :  "  + xhr2.responseText)
 								/*
-									div class="competition-wrapper"> 
+									<div class="competition-wrapper"> 
 									<a href="/nl/eredivisie/akmkihra9ruad09ljapsm84b3"   class="competition-title" > 
 									<span class="competition-name">Eredivisie</span> 
 									</a> </div> <div class="match-row-list">   
@@ -112,7 +116,9 @@ App {
 								var n200 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">') + 1
 								var n210 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">',n200)
 								var competitionblock = xhr2.responseText.substring(n200, n210)
+								
 								//console.log("competitionblock :  "  + competitionblock)
+								
 								i=0
 								sizeoftilefont=20
 								calculatedfontzize-20
@@ -167,61 +173,80 @@ App {
 
 												var newscoretotal = parseInt(homescore) + parseInt(outscore)
 												if (newscoretotal == 0) {oldscoretotal[i]=0}
+												
+												//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 
 												if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
-														
+													if (!isFirstRun){
 														console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+														//console.log("selectedteams: " + selectedteams)
 														var teamsarray = selectedteams.split(';')
+														//console.log("teamsarray.length: " + teamsarray.length)
 														for(var x = 0;x < teamsarray.length;x++){
 															var teamcheck = teamsarray[x].toLowerCase()
+															console.log("checking team: " + teamcheck)
 															var combiteam = homeplayer + outplayer
-															if((combiteam.toLowerCase().indexOf(teamcheck.toLowerCase()) != -1)  && teamcheck.length > 2){
+															combiteam = combiteam.toLowerCase()
+															//console.log("combi team: " + combiteam)
+															if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
 																///////////////////////////////////////
 																////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																
-																	var str1 = "{\"teams\" : \"";
-																	var str2 = homeplayer + " - " + outplayer;
-																	var str3 = "\", \"score\":\"";
-																	var str4 = homescore + " - " + outscore;
-																	var str5 = "\"}";
-																	var res = str1.concat(str2, str3, str4, str5);
-																	var doc2 = new XMLHttpRequest();
-																	doc2.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json");
-																	doc2.send(res);
+																	console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																	
+																	
+																	var setJson = {
+																		"teams" : homeplayer + " - " + outplayer,
+																		"score" : homescore + " - " + outscore
+																	}
+																	var doc = new XMLHttpRequest()
+																	doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
+																	doc.send(JSON.stringify(setJson))
 																	
 																	oldlampstatus = lampstatus
 																	
 																	if(selectedlampsbyuuid.length>0){
-																		if (selectedscenebyuuid.length>0) //select new special scene
+																		if (selectedscenebyuuid.length>0){ //select new special scene
 																			var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
 																			msg.addArgument("scene",  parseInt(selectedscenebyuuid));
 																			bxtClient.sendMsg(msg);
 																			console.log("Blinking started");
 																		}
 																		lampblinkTimer.running = true
-																		//lampTimer.running = true
+																		lampTimer.running = true
 																	}
 																	
+																	goalTimer.running = true
 																	animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
 																	animationscreen.animationInterval= isNxt ? 100000 : 100000
 																	animationscreen.isVisibleinDimState= true	
 																	animationscreen.animationRunning= true;
-																	goalTimer.running = true
-																	
+																																	
 																///////////////////////////////////////
 																
 																break;
-															}
-														}
+																
+															}//match of team forund in new score match
+														}//for each teamsarray
+													
+													}//isFirstRun?
+													
 													oldscoretotal[i] = newscoretotal
-												}
-											}
-								}
-							}
-						matchesUpdated()		
-					}
+												
+												} //oldscore!=newscore
+											}//row found
+										}//end of while
+								}//eredivisie found
+							isFirstRun = false	
+							matchesUpdated()
+							
+					}//xhr status = 200
 				}//end of xhr2.readystate
+			}//xhr onreadystate
+				
 			xhr2.send()
+			
+			
 		}
 		
 		function getLampStates(update){
@@ -273,15 +298,12 @@ App {
 		}
 		
 		function restorelamps(){
-			console.log("Restoring lamps to old status")
 			for (var i = 0; i < oldlampstatus.length; i++){
 				var lamp1 = oldlampstatus[i]
 				var lampArray=lamp1.split(':')
-						console.log("Restoring lamp " + lampArray[0] + " to old status")
-						console.log(lampArray[0])
-						console.log(lampArray[1])	
+						console.log("Restoring lamp " + lampArray[0] + " to " + lampArray[1])
 						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, lampArray[0] , "SwitchPower", "SetTarget");
-						msg.addArgument("NewTargetValue", (parseInt(lampstate) == 0)? "0": "1");
+						msg.addArgument("NewTargetValue", (parseInt(lampArray[1]) == 0)? "0": "1");
 						bxtClient.sendMsg(msg);
 			}
 		}
@@ -304,12 +326,6 @@ App {
 			onTriggered: {
 				animationscreen.animationRunning= false;
 				animationscreen.isVisibleinDimState= false;			
-				lampblinkTimer.running = false
-				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
-					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
-					msg.addArgument("scene", 0)
-					bxtClient.sendMsg(msg)
-				}
 				restorelamps()
 				goalTimer.running = false
 			}
@@ -328,27 +344,24 @@ App {
 						msg.addArgument("NewTargetValue", lampstate? "0": "1");
 						bxtClient.sendMsg(msg);
 					}
-					if (lampstate){
-						console.log("Blink On");
-						}
 					lampstate = !lampstate
 			}
 		}
 
 		Timer {
 			id: lampTimer   //delay to stop blinking lamps
-			interval: 6000  
+			interval: (notificationtime -4000)  
 			repeat: false
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
 				lampblinkTimer.running = false
 				if (selectedscenebyuuid.length>0){ //select scene 0 as standard scene
+					console.log("Scene 0 selected")
 					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene")
-					msg.addArgument("scene", 0)
+					msg.addArgument("scene", "0")
 					bxtClient.sendMsg(msg)
 				}
-				restorelamps()
 				lampTimer.running = false
 			}
 		}

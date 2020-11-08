@@ -74,7 +74,7 @@ Item {
 			radius: 4   
 			Text{
 				id:text1
-				font.pixelSize:  isNxt ? 30 : 22
+				font.pixelSize:  isNxt ? parseInt(2*(parent.width-50)/teams.length): 22
 				font.family: qfont.regular.name
 				font.bold: true
 				color:  "red" 
