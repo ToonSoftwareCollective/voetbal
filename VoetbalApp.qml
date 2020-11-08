@@ -163,7 +163,7 @@ App {
 												items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 												
 
-												var calculatedfontzize = isNxt? parseInt(590/items[i].length):parseInt(500/items[i].length)
+												var calculatedfontzize = isNxt? parseInt(560/items[i].length):parseInt(500/items[i].length)
 												if (sizeoftilefont > calculatedfontzize){
 													sizeoftilefont=calculatedfontzize
 												}
@@ -200,7 +200,7 @@ App {
 																		//console.log("Old lamp States" + oldlampArray[0] + " to " + oldlampArray[1])
 																	}
 																
-																	//console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																	
 																	var setJson = {
 																		"teams" : homeplayer + " - " + outplayer,
