@@ -20,53 +20,76 @@ Tile {
 		}
 	}
 
-	GridView {
-		id: matchListView
 
-		model: matchModel
-		delegate: Text {
-				id: mytext
-				text: match
-				font {
-					family: qfont.semiBold.name
-					pixelSize: isNxt ? app.sizeoftilefont : 16
-				}
-			}
-
-		flow: GridView.TopToBottom
-		cellWidth: parent.width
-		cellHeight: isNxt ? parseInt(170/app.items.length) : parseInt(140/app.items.length)
-		height : parent.height - 40
-		width : parent.width
-		anchors {
-			top: parent.top
-			left: parent.left
-		}
-	}
-
+	
 	ListModel {
 		id: matchModel
 	}
 
-	NewTextLabel {
-		id: setupText
-		width: parent.width-30
-		height: isNxt ? 35 : 30
-		buttonActiveColor: "lightgrey"
-		buttonHoverColor: "blue"
-		enabled : true
-		textColor : "black"
-		buttonText:  "Setup"
+	Rectangle{
+		height : parent.height -20
+		width : parent.width-20
 		anchors {
-			bottom: parent.bottom
+			top: parent.top
 			left: parent.left
-			leftMargin:15
-			bottomMargin: 5
-			}
-		onClicked: {
-			onClicked: {stage.openFullscreen(app.voetbalConfigScreenUrl)}	
+			leftMargin: 10
+			topMargin:10
 		}
-		visible: !dimState
+		color: "white"
+		
+		Text {
+			id: label1
+			text: "Voetbal" 
+			anchors {
+				baseline: parent.top
+				baselineOffset: isNxt ? 50 : 40
+				horizontalCenter: parent.horizontalCenter
+			}
+			color: colors.clockTileColor
+			
+			font.pixelSize: isNxt ? 20 : 16
+			font.family: qfont.regular.name
+			visible: (app.items.length<1)
+		}
+		
+		GridView {
+			id: matchListView
+
+			model: matchModel
+			delegate: Text {
+					id: mytext
+					text: match
+					font {
+						family: qfont.semiBold.name
+						pixelSize: isNxt ? app.sizeoftilefont : 16
+					}
+				}
+
+			flow: GridView.TopToBottom
+			cellWidth: parent.width
+			cellHeight: isNxt ? parseInt(195/app.items.length) : parseInt(140/app.items.length)
+			height : parent.height
+			width : parent.width
+			anchors {
+				top: parent.top
+				left: parent.left
+			}
+			visible: (app.items.length>0)
+		}
+		MouseArea {
+			height : parent.height/2
+			width : parent.width/2
+			anchors {
+				top: parent.top
+				left: parent.left
+				leftMargin: parent.width/4
+				topMargin:parent.height/4
+			}
+			onClicked: {
+				stage.openFullscreen(app.voetbalConfigScreenUrl)
+			}
+        }
+		
 	}
-	
 }
+	
