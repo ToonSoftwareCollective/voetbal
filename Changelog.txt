@@ -1,0 +1,6 @@
+1.0.9
+- tile changed so that the gridview is moved to the right to give some space for the toon controls when holding the tile (red cross, remove tile)
+- dimState added to tile
+ 
+1.0.0
+- initial release
