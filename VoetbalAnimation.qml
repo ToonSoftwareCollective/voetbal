@@ -77,7 +77,7 @@ Item {
 				font.pixelSize:  isNxt ? parseInt(2*(parent.width-50)/teams.length): 22
 				font.family: qfont.regular.name
 				font.bold: true
-				color:  "red" 
+				color:  "black" 
 				text: teams
 				anchors {
 					top: parent.top
@@ -90,7 +90,7 @@ Item {
 				font.pixelSize:  isNxt ? 80 : 65
 				font.family: qfont.regular.name
 				font.bold: true
-				color:  "red" 
+				color:  "black" 
 				text: scores
 				anchors {
 					top: text1.bottom
