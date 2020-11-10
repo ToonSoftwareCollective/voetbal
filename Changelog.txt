@@ -1,3 +1,18 @@
+1.0.10
+- updateMatchesList of til echanged changed
+- oldlampstatus improved (will be stored every scrape run)
+- when no matches in list, scrape timer will be set to 120s
+- configscreen split into multiple screens
+- pixelsize newtextlabel changed to 20:16
+- language to dutch
+- screens changed for use with Toon1
+- color in dim changes
+
+
+
+
+	
+
 1.0.9
 - tile changed so that the gridview is moved to the right to give some space for the toon controls when holding the tile (red cross, remove tile)
 - dimState added to tile
