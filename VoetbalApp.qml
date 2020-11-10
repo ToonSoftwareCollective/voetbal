@@ -12,6 +12,10 @@ App {
 		property 		    VoetbalTile voetbalTile
 		property		    VoetbalConfigScreen voetbalConfigScreen
 		property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
+		property		    VoetbalConfigScreen2 voetbalConfigScreen2
+		property url 		voetbalConfigScreenUrl2 : "VoetbalConfigScreen2.qml"
+		property		    VoetbalConfigScreen3 voetbalConfigScreen3
+		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
@@ -24,15 +28,16 @@ App {
 		
 
 		property  string	selectedteams : ""
-		property  string    selectedlampsbyuuid : ""
-		property  string    selectedlampsbyname  : ""
-		property  string    selectedscenebyuuid : ""
-		property  string    selectedscenebyname  : ""
+		property  string        selectedlampsbyuuid : ""
+		property  string        selectedlampsbyname  : ""
+		property  string        selectedscenebyuuid : ""
+		property  string        selectedscenebyname  : ""
 		property  string 	bridgeuuid
 		property  int		sizeoftilefont
 		property  int		notificationtime: 10000
 		
 		property bool		isFirstRun: true
+		property bool 		showmatchesontile: false
 
 		property  string	firstlinescreentext : "skjfdsjkfjk - sdfhsdjhfjsdhfj"
 		property  string	secondlinescreentext : "0 - 1"
@@ -76,6 +81,8 @@ App {
 		function init() {
 			registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"})
 			registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen")
+			registry.registerWidget("screen", voetbalConfigScreenUrl2, this, "voetbalConfigScreen2")
+			registry.registerWidget("screen", voetbalConfigScreenUrl3, this, "voetbalConfigScreen3")
 		}
 
 
@@ -86,6 +93,7 @@ App {
 			xhr2.onreadystatechange = function() {
 				if (xhr2.readyState == XMLHttpRequest.DONE) {
 					if (xhr2.status == 200) {
+								//console.log("XHR READY :  ")
 								//console.log("responsetext :  "  + xhr2.responseText)
 								/*
 									<div class="competition-wrapper"> 
@@ -163,9 +171,15 @@ App {
 												items[i] = eventtime + " " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 												
 
-												var calculatedfontzize = isNxt? parseInt(560/items[i].length):parseInt(500/items[i].length)
+												var calculatedfontzize = isNxt? parseInt(560/items[i].length):parseInt(420/items[i].length)
 												if (sizeoftilefont > calculatedfontzize){
 													sizeoftilefont=calculatedfontzize
+												}
+												
+												if ((items[0].length)>2){
+													showmatchesontile = true
+												}else{
+													showmatchesontile = false
 												}
 												
 												i=i+1
@@ -177,6 +191,14 @@ App {
 												//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 
 												if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
+												
+													oldlampstatus = lampstatus
+													for (var lcount = 0; lcount < oldlampstatus.length; lcount++){
+														var lampold = oldlampstatus[lcount]
+														var oldlampArray=lampold.split(':')
+														//console.log("Old lamp States" + oldlampArray[0] + " to " + oldlampArray[1])
+													}
+																	
 													if (!isFirstRun){
 														
 														//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
@@ -192,13 +214,6 @@ App {
 															if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
 																///////////////////////////////////////
 																////SPECIAL ACTION WHEN GOAL HERE!!!!!!
-																
-																	oldlampstatus = lampstatus
-																	for (var lcount = 0; lcount < oldlampstatus.length; lcount++){
-																		var lampold = oldlampstatus[lcount]
-																		var oldlampArray=lampold.split(':')
-																		//console.log("Old lamp States" + oldlampArray[0] + " to " + oldlampArray[1])
-																	}
 																
 																console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																	
@@ -317,7 +332,7 @@ App {
 		
 		Timer {
 			id: voetbalTimer   //interval to scrape data
-			interval: 10000
+			interval: showmatchesontile? 10000:3600000  //whan there are no matches, set timer to 10 min
 			repeat: true
 			running: true
 			triggeredOnStart: true

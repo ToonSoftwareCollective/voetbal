@@ -48,7 +48,7 @@ Item {
 			font {
 				family: qfont.semiBold.name
 				//pixelSize: qfont.titleText
-				pixelSize:isNxt ? 16 : 12
+				pixelSize:isNxt ? 20:16
 			}
 			text: buttonText
 			color: newTextLabel.enabled? textColor: textDisabledColor
