@@ -262,7 +262,7 @@ Screen {
 				if  (selectedlampsbyuuid.length<1){
 					selectedlampsbyuuid = lampsUUID[listview1.currentIndex]
 					selectedlampsbyname = model1.get(listview1.currentIndex).name
-					selectedlampsText += ", " + model1.get(listview1.currentIndex).name
+					selectedlampsText = model1.get(listview1.currentIndex).name
 				}else{
 					selectedlampsbyuuid += ";" + lampsUUID[listview1.currentIndex]
 					selectedlampsbyname += ";" + model1.get(listview1.currentIndex).name
