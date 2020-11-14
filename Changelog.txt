@@ -1,3 +1,8 @@
+1.0.13
+- when scored in multiple matches at the same time, multiple notifiactions will be given
+- extra space in selected teams box
+
+
 1.0.12
 - extra time to select the time the lamps will blink
 - configscreen 3 to select the time
