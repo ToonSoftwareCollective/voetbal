@@ -1,6 +1,9 @@
 1.0.13
 - when scored in multiple matches at the same time, multiple notifiactions will be given
 - extra space in selected teams box
+- extra toggle switch in configscreen 3: only let lamps blink when fav team has scored
+- app : only let lamps blink when fav team has scored
+
 
 
 1.0.12

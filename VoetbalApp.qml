@@ -24,18 +24,20 @@ App {
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
 		property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
+		property variant 	oldhomescore: [0,0,0,0,0,0,0,0,0,0]
+		property variant 	oldoutscore: [0,0,0,0,0,0,0,0,0,0]
 		
 		property variant 	deviceStatusInfo: ({})
 		property variant 	hueScenes: []
 		property variant 	lampstatus: []
 		property variant 	oldlamps: []
 		
-
+		property  string	scoringTeam : ""
 		property  string	selectedteams : ""
-		property  string        selectedlampsbyuuid : ""
-		property  string        selectedlampsbyname  : ""
-		property  string        selectedscenebyuuid : ""
-		property  string        selectedscenebyname  : ""
+		property  string    selectedlampsbyuuid : ""
+		property  string    selectedlampsbyname  : ""
+		property  string    selectedscenebyuuid : ""
+		property  string    selectedscenebyname  : ""
 		property  string 	bridgeuuid
 		property  int		sizeoftilefont
 		property  int		notificationtime: 10000
@@ -45,10 +47,11 @@ App {
 		property bool 		showmatchesontile: false
 		property bool 		isDemoMode: false
 		property bool 		isInNotificationMode: false
-
+		property bool 		favscored: false
+		property bool 		scoreOwnLightMode: false
 		
-		property  string	firstlinescreentext : "skjfdsjkfjk - sdfhsdjhfjsdhfj"
-		property  string	secondlinescreentext : "0 - 1"
+		property  string	firstlinescreentext : ""
+		property  string	secondlinescreentext : ""
 		
 		property  string        oldlampString  : ""
 		
@@ -62,7 +65,8 @@ App {
 			'LampUUID' : "",
 			'LampName' : "",
 			'SceneUUID': "",
-			'SceneName': ""
+			'SceneName': "",
+			'scoreOwnLightMode': ""
 		}
 		property bool lampstate: false
 
@@ -77,6 +81,13 @@ App {
 		Component.onCompleted: {
 			try {
 				voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
+				
+				if (voetbalSettingsJson['scoreOwnLightMode'] == "Yes") {
+					scoreOwnLightMode = true
+				} else {
+					scoreOwnLightMode = false
+				}
+
 				notificationtime = voetbalSettingsJson['notificationtime']
 				lampNotificationtime = voetbalSettingsJson['lampNotificationtime']
 				selectedteams = voetbalSettingsJson['favoriteTeams']
@@ -206,6 +217,14 @@ App {
 													//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 													
 													if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)){   //new goal scored this match
+														if ((oldhomescore[i] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
+															scoringTeam = homeplayer
+														}
+														
+														if ((oldoutscore[i] != outscore) && (outscore>0)){ //new goal scored this match by outplayer
+															scoringTeam = outplayer
+														}
+														favscored=false
 			
 														if (!isFirstRun){
 															
@@ -224,38 +243,36 @@ App {
 																	////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																	
 																	isInNotificationMode = true
-																	
+																	favscored=false
 																	//console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																	
-																	oldlampString = ""
-																		for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
-																		var lamp = lampstatus[lampcount]
-																		//console.log("Old lamp State:  " + lampstatus[lampcount])
-																		if (oldlampString.length<1){
-																			oldlampString = lampstatus[lampcount]
-																		}else{
-																			oldlampString += ";" + lampstatus[lampcount]
+																	//////////////BLINK LAMPS////////////////////////
+																	if (scoreOwnLightMode){
+																		var teamsarray2 = selectedteams.split(';')
+																		for(var sctem = 0;sctem  < teamsarray2.length;sctem ++){
+																			var teamcheck2 = teamsarray2[sctem].toLowerCase()
+																			var scoringTeam = scoringTeam.toLowerCase()
+																			if((scoringTeam.indexOf(teamcheck2) != -1)  && teamcheck2.length > 2){
+																				favscored=true
+																			}	
 																		}
-																	}	
-																	//console.log("oldlampString:  " + oldlampString)
-																	
-																	/*oldlamps = lampstatus
-																	for (var lampcount = 0; lampcount < oldlamps.length; lampcount++){
-																		var oldlamp = oldlamps[lampcount]
-																		var oldlampArray += oldlamp.split(':')
-																		//console.log("Old lamp State:  " + oldlampArray[0] + "   was in old situation " + oldlampArray[1])
+																	}else{
+																		favscored=true
 																	}
 																	
-																	*/
+																	if (favscored){
+																		oldlampString = ""
+																			for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
+																			var lamp = lampstatus[lampcount]
+																			//console.log("Old lamp State:  " + lampstatus[lampcount])
+																			if (oldlampString.length<1){
+																				oldlampString = lampstatus[lampcount]
+																			}else{
+																				oldlampString += ";" + lampstatus[lampcount]
+																			}
+																		}	
+																		//console.log("oldlampString:  " + oldlampString)
 																		
-																		var setJson = {
-																			"teams" : homeplayer + " - " + outplayer,
-																			"score" : homescore + " - " + outscore
-																		}
-																		var doc = new XMLHttpRequest()
-																		doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
-																		doc.send(JSON.stringify(setJson))
-		
 																		if(selectedlampsbyuuid.length>0){
 																			if (selectedscenebyuuid.length>0){ //select new special scene
 																				var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
@@ -266,12 +283,22 @@ App {
 																			lampblinkTimer.running = true
 																			lampTimer.running = true
 																		}
-																		
-																		goalTimer.running = true
-																		animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
-																		animationscreen.animationInterval= isNxt ? 100000 : 100000
-																		animationscreen.isVisibleinDimState= true	
-																		animationscreen.animationRunning= true;
+																	}
+																	//////////////CREATE SCREEN NOTIFICATION////////////////////////
+																	
+																	var setJson = {
+																		"teams" : homeplayer + " - " + outplayer,
+																		"score" : homescore + " - " + outscore
+																	}
+																	var doc = new XMLHttpRequest()
+																	doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
+																	doc.send(JSON.stringify(setJson))
+	
+																	goalTimer.running = true
+																	animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
+																	animationscreen.animationInterval= isNxt ? 100000 : 100000
+																	animationscreen.isVisibleinDimState= true	
+																	animationscreen.animationRunning= true;
 																																		
 																	///////////////////////////////////////
 																	
@@ -283,6 +310,8 @@ App {
 														}//isFirstRun?
 														
 														oldscoretotal[i] = newscoretotal
+														oldhomescore[i]=homescore
+														oldoutscore[i]=outscore
 													
 													} //oldscore!=newscore
 												}//row found
@@ -414,6 +443,13 @@ App {
 		}
 		
 		function saveSettings() {
+			var tmpscoreOwnLightMode
+			if (scoreOwnLightMode == true) {
+				tmpscoreOwnLightMode= "Yes";
+			} else {
+				tmpscoreOwnLightMode = "No";
+			}
+
 			var setJson = {
 				"favoriteTeams" : selectedteams,
 				"notificationtime" : notificationtime,
@@ -422,6 +458,7 @@ App {
 				"LampName" 	: selectedlampsbyname,
 				"SceneUUID" : selectedscenebyuuid,
 				"SceneName" : selectedscenebyname,
+				"scoreOwnLightMode" : tmpscoreOwnLightMode,
 				"Bridgeuuid" : bridgeuuid
 			}
 			var doc = new XMLHttpRequest()

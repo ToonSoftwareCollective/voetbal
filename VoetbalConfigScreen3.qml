@@ -32,6 +32,7 @@ Screen {
 		selectedscenebyuuid = app.selectedscenebyuuid
 		selectedscenebyname = app.selectedscenebyname
 		selectedLampstoText()
+		enableScoreModeToggle.isSwitchedOn = app.scoreOwnLightMode;
 		//console.log ("selectedlampsbyname: " + selectedlampsbyname)
 	}
 
@@ -464,7 +465,7 @@ Screen {
 	Text {
 		id: mySelectedSceneText
 		//text: "Selected scene: "
-		text: "geselecteerd scene: "
+		text: "Geselecteerde scene: "
 		font {
 			family: qfont.semiBold.name
 			pixelSize: isNxt ? 18:14
@@ -500,28 +501,60 @@ Screen {
 		//buttonText:  "Clear"
 		buttonText:  "Verwijder"
 		anchors {
-			top: mySelectedSceneText.bottom
-			left: selectedLampsT.left
-			topMargin: isNxt ? 8 : 6
+			top: mySelectedSceneText2.top
+			left: minText.left
+			//leftMargin:  isNxt ? 16 : 12
+			//topMargin: isNxt ? 8 : 6
 		}
 		onClicked: {
 			selectedscenebyname = ""
 			selectedscenebyuuid = ""
 		}	
 	}
+
+
 	
-		Text {
+	Text {
+		id: scoreMode
+		text: "Lampen alleen als favoriet scoort: "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			left: mySelectedSceneText.left
+			top: mySelectedSceneText.bottom
+			topMargin: isNxt ? 20:16
+		}
+	}
+
+	OnOffToggle {
+		id: enableScoreModeToggle
+		height:  30
+		anchors.left: minText.left
+		//anchors.leftMargin: isNxt ? 20 : 16
+		anchors.top: scoreMode.top
+		leftIsSwitchedOn: false
+		onSelectedChangedByUser: {
+			if (isSwitchedOn) {
+				app.scoreOwnLightMode = true;
+			} else {
+				app.scoreOwnLightMode = false;
+			}
+		}
+	}
+	
+	Text {
 		id: mytimerlabel
-		//text: "Time for notification (seconds): " 
-		text: "Tijd dat de lampen knipperen (seconden): "
+		//text: "Time for notification (sec): " 
+		text: "Tijd dat de lampen knipperen (sec): "
 		font {
 			family: qfont.semiBold.name
 			pixelSize: isNxt ? 18:14
 		}
 		anchors {
-			top:addText2.bottom
-			left:listviewContainer1.left
-			topMargin: 8
+			top:scoreMode.bottom
+			left:scoreMode.left
+			topMargin: isNxt ? 20:16
 		}
 	}
 	
@@ -561,7 +594,6 @@ Screen {
 		}
 	}
 	
-
 	NewTextLabel {
 		id:plusText
 		width: isNxt ? 55 : 45;  
