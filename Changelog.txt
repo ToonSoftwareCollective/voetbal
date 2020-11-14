@@ -1,3 +1,14 @@
+1.0.12
+- extra time to select the time the lamps will blink
+- configscreen 3 to select the time
+- changed oldlamparray to string type
+- fixed scenes not working (bridge not saved)
+- configscreen 3 to select save the bridge uuid correctly
+- all console.log comment lines removed
+- animation color changed to yellow (was lightgreen)
+- demomode added
+
+
 1.0.11
 -error fixed in animation
 

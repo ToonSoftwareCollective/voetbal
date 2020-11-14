@@ -20,24 +20,28 @@ Screen {
 	property string  selectedscenebyuuid : ""
 	property string  bridgeuuid : ""
 	property bool bridgefound: false
+	property int lampNotificationtime
 	
 	
 	onShown: {
 		addCustomTopRightButton("Opslaan")
 		getLamps()
+		lampNotificationtime = app.lampNotificationtime
 		selectedlampsbyuuid = app.selectedlampsbyuuid
 		selectedlampsbyname = app.selectedlampsbyname
 		selectedscenebyuuid = app.selectedscenebyuuid
 		selectedscenebyname = app.selectedscenebyname
 		selectedLampstoText()
-		console.log ("selectedlampsbyname: " + selectedlampsbyname)
+		//console.log ("selectedlampsbyname: " + selectedlampsbyname)
 	}
 
 	onCustomButtonClicked: {
 		app.selectedlampsbyuuid = selectedlampsbyuuid
 		app.selectedlampsbyname = selectedlampsbyname
+		app.lampNotificationtime = lampNotificationtime
 		app.selectedscenebyuuid = selectedscenebyuuid
 		app.selectedscenebyname = selectedscenebyname
+		app.bridgeuuid = bridgeuuid
 		app.saveSettings()
 		hide()
 	}
@@ -73,7 +77,7 @@ Screen {
 									var n20 = lampsArray[x0].indexOf('<uuid>') + 6
 									//console.log("Found <uuid> : "  + n20)
 									var n21 = lampsArray[x0].indexOf('</uuid>',n21)
-									var bridgeuuid = lampsArray[x0].substring(n20, n21)
+									bridgeuuid = lampsArray[x0].substring(n20, n21)
 									//console.log("Found Hue Bridge : "  + bridgeuuid)
 									if (bridgeuuid.length>10){// bridge found
 										bridgefound=true
@@ -350,7 +354,7 @@ Screen {
 	Rectangle{
 		id: listviewContainer2
 		width: isNxt ? parent.width/2 -100 :  parent.width/2 -80
-		height: isNxt ? 160 : 120
+		height: isNxt ? 100 : 80
 		color: "white"
 		radius: isNxt ? 5 : 4
 		border.color: "black"
@@ -504,6 +508,79 @@ Screen {
 			selectedscenebyname = ""
 			selectedscenebyuuid = ""
 		}	
+	}
+	
+		Text {
+		id: mytimerlabel
+		//text: "Time for notification (seconds): " 
+		text: "Tijd dat de lampen knipperen (seconden): "
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 18:14
+		}
+		anchors {
+			top:addText2.bottom
+			left:listviewContainer1.left
+			topMargin: 8
+		}
+	}
+	
+	NewTextLabel {
+		id:minText
+		width: isNxt ? 55 : 45;  
+		height: isNxt ?40:32
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  "-"
+		anchors {
+			top: mytimerlabel.top
+			left:  mytimerlabel.right
+			leftMargin:  isNxt ? 6 :4
+		}
+		onClicked: {
+			if (lampNotificationtime>5000){
+				lampNotificationtime = lampNotificationtime -1000
+			}
+		}
+	}
+
+	Text {
+		id: mytimerlabel2
+		text:  lampNotificationtime/1000
+
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 18:14
+		}
+		anchors {
+			top:mytimerlabel.top
+			left:minText.right
+			leftMargin:  isNxt ?  10 : 8
+		}
+	}
+	
+
+	NewTextLabel {
+		id:plusText
+		width: isNxt ? 55 : 45;  
+		height: isNxt ? 40:32
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  "+"
+		anchors {
+			top: minText.top
+			left: mytimerlabel2.right
+			leftMargin:isNxt ?  10 : 8
+			}
+		onClicked: {
+			if (lampNotificationtime<100000){
+				lampNotificationtime = lampNotificationtime +1000
+			}
+		}
 	}
 }
 

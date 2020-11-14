@@ -8,7 +8,7 @@ App {
 		id: voetbalApp
 
 		property url 		tileUrl : "VoetbalTile.qml"
-		property url 		thumbnailIcon: "qrc:/tsc/doorcam.png"
+		property url 		thumbnailIcon: "qrc:/tsc/VoetbalIcon.png"
 		property 		    VoetbalTile voetbalTile
 		property		    VoetbalConfigScreen voetbalConfigScreen
 		property url 		voetbalConfigScreenUrl : "VoetbalConfigScreen.qml"
@@ -16,6 +16,10 @@ App {
 		property url 		voetbalConfigScreenUrl2 : "VoetbalConfigScreen2.qml"
 		property		    VoetbalConfigScreen3 voetbalConfigScreen3
 		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
+		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+		property url 		demoUrl : "http://oepiloepi.eu/competitie.html"
+		property url 		selectedUrl : scraperUrl
+		
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
@@ -24,7 +28,7 @@ App {
 		property variant 	deviceStatusInfo: ({})
 		property variant 	hueScenes: []
 		property variant 	lampstatus: []
-		property variant 	oldlampstatus: []
+		property variant 	oldlamps: []
 		
 
 		property  string	selectedteams : ""
@@ -35,17 +39,23 @@ App {
 		property  string 	bridgeuuid
 		property  int		sizeoftilefont
 		property  int		notificationtime: 10000
+		property  int		lampNotificationtime:6000
 		
 		property bool		isFirstRun: true
 		property bool 		showmatchesontile: false
+		property bool 		isDemoMode: false
 
+		
 		property  string	firstlinescreentext : "skjfdsjkfjk - sdfhsdjhfjsdhfj"
 		property  string	secondlinescreentext : "0 - 1"
+		
+		property  string        oldlampString  : ""
 		
 		property bool goaltimerrunning : false
 		
 		property variant voetbalSettingsJson : {
 			'notificationtime': 0,
+			'lampNotificationtime': 0,
 			'favoriteTeams': "",
 			'Bridgeuuid': "",
 			'LampUUID' : "",
@@ -67,6 +77,7 @@ App {
 			try {
 				voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
 				notificationtime = voetbalSettingsJson['notificationtime']
+				lampNotificationtime = voetbalSettingsJson['lampNotificationtime']
 				selectedteams = voetbalSettingsJson['favoriteTeams']
 				selectedlampsbyuuid = voetbalSettingsJson['LampUUID']
 				selectedlampsbyname = voetbalSettingsJson['LampName']
@@ -87,9 +98,14 @@ App {
 
 
 		function getURL() {
+		
+			if (isDemoMode){
+				selectedUrl = demoUrl
+			}else{
+				selectedUrl = scraperUrl
+			}
 			var xhr2 = new XMLHttpRequest();
-			xhr2.open("GET", "https://www.goal.com/nl/live-scores", true); //check the feeds from the webpage
-			//xhr2.open("GET", "http://oepiloepi.eu/competitie.html", true); //check the feeds from the webpage
+			xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 			xhr2.onreadystatechange = function() {
 				if (xhr2.readyState == XMLHttpRequest.DONE) {
 					if (xhr2.status == 200) {
@@ -119,7 +135,7 @@ App {
 								 */
 								var n100 = 1
 								for (var i = 0; i < items.length; i++) items[i] =""  //clear array
-
+														
 								var found = 2
 								var n200 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">') + 1
 								var n210 = xhr2.responseText.indexOf('<div class=\"competition-wrapper\">',n200)
@@ -130,7 +146,6 @@ App {
 								i=0
 								sizeoftilefont=20
 								calculatedfontzize-20
-
 								var found99 =  competitionblock.indexOf('>Eredi')
 								if (found99>1){
 																		
@@ -192,12 +207,10 @@ App {
 
 												if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0)){   //new goal scored this match
 												
-													oldlampstatus = lampstatus
-													for (var lcount = 0; lcount < oldlampstatus.length; lcount++){
-														var lampold = oldlampstatus[lcount]
-														var oldlampArray=lampold.split(':')
-														//console.log("Old lamp States" + oldlampArray[0] + " to " + oldlampArray[1])
-													}
+												
+															
+												
+													
 																	
 													if (!isFirstRun){
 														
@@ -215,7 +228,28 @@ App {
 																///////////////////////////////////////
 																////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																
-																console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																	//console.log("START To Write: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																
+																oldlampString = ""
+																	for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
+																	var lamp = lampstatus[lampcount]
+																	//console.log("Old lamp State:  " + lampstatus[lampcount])
+																	if (oldlampString.length<1){
+																		oldlampString = lampstatus[lampcount]
+																	}else{
+																		oldlampString += ";" + lampstatus[lampcount]
+																	}
+																}	
+																//console.log("oldlampString:  " + oldlampString)
+																
+																/*oldlamps = lampstatus
+																for (var lampcount = 0; lampcount < oldlamps.length; lampcount++){
+																	var oldlamp = oldlamps[lampcount]
+																	var oldlampArray += oldlamp.split(':')
+																	//console.log("Old lamp State:  " + oldlampArray[0] + "   was in old situation " + oldlampArray[1])
+																}
+																
+																*/
 																	
 																	var setJson = {
 																		"teams" : homeplayer + " - " + outplayer,
@@ -226,11 +260,10 @@ App {
 																	doc.send(JSON.stringify(setJson))
 	
 																	if(selectedlampsbyuuid.length>0){
-																		if (selectedscenebyuuid.length>2){ //select new special scene
+																		if (selectedscenebyuuid.length>0){ //select new special scene
 																			var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
 																			msg.addArgument("scene",  parseInt(selectedscenebyuuid));
 																			bxtClient.sendMsg(msg);
-																			
 																		}
 																		//console.log("Blinking started");
 																		lampblinkTimer.running = true
@@ -270,34 +303,34 @@ App {
 			
 		}
 		
-		function getLampStates(update){
-				for (var lampc = 0; lampc < lampstatus.length; lampc++) lampstatus[lampc] =""  //clear array
-				x = 0
-				var infoList = deviceStatusInfo;
-				var infoNode = update.getChild("device", 0);
-				while (infoNode && infoNode.name === "device") {
-					var uuidNode = infoNode.getChild("DevUUID");
-					var device = infoList[uuidNode.text];
-					if (!device)
-						device = {};
-						var childNode = infoNode.child;
-						while (childNode) {
-							//console.log("childNode.name " + childNode.name);
-							if (childNode.name == "DevUUID"){
-								var lampname = childNode.text;
-							}
-							if (childNode.name == "CurrentState"){
-								var lamponoff = childNode.text;
-								lampstatus[x] = lampname + ":" + lamponoff;
-								x = x + 1
-							}
-							//console.log("childNode.text " + childNode.text);
-							childNode = childNode.sibling;
+		function getLampStates(update){											
+			for (var lampc = 0; lampc < lampstatus.length; lampc++) lampstatus[lampc] =""  //clear array
+			x = 0
+			var infoList = deviceStatusInfo;
+			var infoNode = update.getChild("device", 0);
+			while (infoNode && infoNode.name === "device") {
+				var uuidNode = infoNode.getChild("DevUUID");
+				var device = infoList[uuidNode.text];
+				if (!device)
+					device = {};
+					var childNode = infoNode.child;
+					while (childNode) {
+						//console.log("childNode.name " + childNode.name);
+						if (childNode.name == "DevUUID"){
+							var lampname = childNode.text;
 						}
-					infoList[uuidNode.text] = device;
-					infoNode = infoNode.next;
-				}
-				deviceStatusInfo = infoList;
+						if (childNode.name == "CurrentState"){
+							var lamponoff = childNode.text;
+							lampstatus[x] = lampname + ":" + lamponoff;
+							x = x + 1
+						}
+						//console.log("childNode.text " + childNode.text);
+						childNode = childNode.sibling;
+					}
+				infoList[uuidNode.text] = device;
+				infoNode = infoNode.next;
+			}
+			deviceStatusInfo = infoList;
 		}
 		
 		
@@ -315,24 +348,21 @@ App {
 		}
 		
 		function restorelamps(){
-			for (var ocount = 0; ocount < oldlampstatus.length; ocount++){
-				var lamp1 = oldlampstatus[ocount]
-				var lampArray=lamp1.split(':')
-				//console.log("Old lamp States" + lampArray[0] + " to " + lampArray[1])
-			}
-			for (var i3 = 0; i3 < oldlampstatus.length; i3++){
-				var lamp1 = oldlampstatus[i3]
-				var lampArray=lamp1.split(':')
-						//console.log("Restoring lamp " + lampArray[0] + " to " + lampArray[1])
-						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, lampArray[0] , "SwitchPower", "SetTarget");
-						msg.addArgument("NewTargetValue", lampArray[1]);
-						bxtClient.sendMsg(msg);
+			//console.log("oldlampString:  " + oldlampString)
+			var oldlampArray=oldlampString.split(';')
+			for (var lcount = 0; lcount <oldlampArray.length; lcount++){
+				var lampoldstatus = oldlampArray[lcount]
+				var oldlampSplit=lampoldstatus.split(':')
+				//console.log("New lamp States:  " + oldlampSplit[0] + "   restoring to old situation " + oldlampSplit[1])
+				var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, oldlampSplit[0] , "SwitchPower", "SetTarget");
+				msg.addArgument("NewTargetValue", oldlampSplit[1]);
+				bxtClient.sendMsg(msg);
 			}
 		}
 		
 		Timer {
 			id: voetbalTimer   //interval to scrape data
-			interval: showmatchesontile? 10000:3600000  //whan there are no matches, set timer to 10 min
+			interval: showmatchesontile? 10000: isDemoMode? 10000: 3600000  //whan there are no matches, set timer to 10 min
 			repeat: true
 			running: true
 			triggeredOnStart: true
@@ -348,7 +378,6 @@ App {
 			onTriggered: {
 				animationscreen.animationRunning= false;
 				animationscreen.isVisibleinDimState= false;			
-				restorelamps()
 				goalTimer.running = false
 			}
 		}
@@ -372,19 +401,19 @@ App {
 
 		Timer {
 			id: lampTimer   //delay to stop blinking lamps
-			interval: (notificationtime -5000)  
+			interval: lampNotificationtime
 			repeat: false
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
 				lampblinkTimer.running = false
-				if (selectedscenebyuuid.length>2){ //select new special scene
+				if (selectedscenebyuuid.length>0){ //select new special scene
 					var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
 					msg.addArgument("scene",  parseInt("0"));
 					bxtClient.sendMsg(msg);
-					
 				}
 				lampTimer.running = false
+				restorelamps()
 			}
 		}
 		
@@ -392,6 +421,7 @@ App {
 			var setJson = {
 				"favoriteTeams" : selectedteams,
 				"notificationtime" : notificationtime,
+				"lampNotificationtime" : lampNotificationtime,
 				"LampUUID" 	: selectedlampsbyuuid,
 				"LampName" 	: selectedlampsbyname,
 				"SceneUUID" : selectedscenebyuuid,
