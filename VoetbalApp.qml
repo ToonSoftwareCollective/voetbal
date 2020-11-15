@@ -17,7 +17,7 @@ App {
 		property		    VoetbalConfigScreen3 voetbalConfigScreen3
 		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
-		property url 		demoUrl : "http://oepiloepi.eu/competitie.html"
+		property url 		demoUrl : "http://xxxxxxxxx.eu/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
 

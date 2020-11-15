@@ -267,6 +267,7 @@ Screen {
 			selectedteams= ""
 			selectedteamsText = ""
 		}
+		visible: (selectedteamsText.length>1)
 	}
 	
 

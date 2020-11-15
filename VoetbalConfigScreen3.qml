@@ -296,7 +296,8 @@ Screen {
 			selectedlampsbyname = ""
 			selectedlampsbyuuid = ""
 			selectedlampsText = ""
-		}	
+		}
+		visible: (selectedlampsText.length>1)
 	}
 
 	Text {
@@ -509,7 +510,8 @@ Screen {
 		onClicked: {
 			selectedscenebyname = ""
 			selectedscenebyuuid = ""
-		}	
+		}
+		visible: (selectedscenebyname.length>1)
 	}
 
 

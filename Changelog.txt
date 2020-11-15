@@ -1,3 +1,7 @@
+1.0.14
+- remove bottons not showing when lists are empty in configscreens
+- max time for hue lights set to max time of notification
+
 1.0.13
 - when scored in multiple matches at the same time, multiple notifiactions will be given
 - extra space in selected teams box
