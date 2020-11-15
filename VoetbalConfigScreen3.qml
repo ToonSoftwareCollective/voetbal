@@ -609,7 +609,7 @@ Screen {
 			leftMargin:isNxt ?  10 : 8
 			}
 		onClicked: {
-			if (lampNotificationtime<100000){
+			if (lampNotificationtime<app.notificationtime){
 				lampNotificationtime = lampNotificationtime +1000
 			}
 		}
