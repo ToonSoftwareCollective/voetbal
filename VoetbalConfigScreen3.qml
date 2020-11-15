@@ -20,24 +20,29 @@ Screen {
 	property string  selectedscenebyuuid : ""
 	property string  bridgeuuid : ""
 	property bool bridgefound: false
+	property int lampNotificationtime
 	
 	
 	onShown: {
 		addCustomTopRightButton("Opslaan")
 		getLamps()
+		lampNotificationtime = app.lampNotificationtime
 		selectedlampsbyuuid = app.selectedlampsbyuuid
 		selectedlampsbyname = app.selectedlampsbyname
 		selectedscenebyuuid = app.selectedscenebyuuid
 		selectedscenebyname = app.selectedscenebyname
 		selectedLampstoText()
-		console.log ("selectedlampsbyname: " + selectedlampsbyname)
+		enableScoreModeToggle.isSwitchedOn = app.scoreOwnLightMode;
+		//console.log ("selectedlampsbyname: " + selectedlampsbyname)
 	}
 
 	onCustomButtonClicked: {
 		app.selectedlampsbyuuid = selectedlampsbyuuid
 		app.selectedlampsbyname = selectedlampsbyname
+		app.lampNotificationtime = lampNotificationtime
 		app.selectedscenebyuuid = selectedscenebyuuid
 		app.selectedscenebyname = selectedscenebyname
+		app.bridgeuuid = bridgeuuid
 		app.saveSettings()
 		hide()
 	}
@@ -73,7 +78,7 @@ Screen {
 									var n20 = lampsArray[x0].indexOf('<uuid>') + 6
 									//console.log("Found <uuid> : "  + n20)
 									var n21 = lampsArray[x0].indexOf('</uuid>',n21)
-									var bridgeuuid = lampsArray[x0].substring(n20, n21)
+									bridgeuuid = lampsArray[x0].substring(n20, n21)
 									//console.log("Found Hue Bridge : "  + bridgeuuid)
 									if (bridgeuuid.length>10){// bridge found
 										bridgefound=true
@@ -291,7 +296,8 @@ Screen {
 			selectedlampsbyname = ""
 			selectedlampsbyuuid = ""
 			selectedlampsText = ""
-		}	
+		}
+		visible: (selectedlampsText.length>1)
 	}
 
 	Text {
@@ -350,7 +356,7 @@ Screen {
 	Rectangle{
 		id: listviewContainer2
 		width: isNxt ? parent.width/2 -100 :  parent.width/2 -80
-		height: isNxt ? 160 : 120
+		height: isNxt ? 100 : 80
 		color: "white"
 		radius: isNxt ? 5 : 4
 		border.color: "black"
@@ -460,7 +466,7 @@ Screen {
 	Text {
 		id: mySelectedSceneText
 		//text: "Selected scene: "
-		text: "geselecteerd scene: "
+		text: "Geselecteerde scene: "
 		font {
 			family: qfont.semiBold.name
 			pixelSize: isNxt ? 18:14
@@ -496,14 +502,119 @@ Screen {
 		//buttonText:  "Clear"
 		buttonText:  "Verwijder"
 		anchors {
-			top: mySelectedSceneText.bottom
-			left: selectedLampsT.left
-			topMargin: isNxt ? 8 : 6
+			top: mySelectedSceneText2.top
+			left: minText.left
+			//leftMargin:  isNxt ? 16 : 12
+			//topMargin: isNxt ? 8 : 6
 		}
 		onClicked: {
 			selectedscenebyname = ""
 			selectedscenebyuuid = ""
-		}	
+		}
+		visible: (selectedscenebyname.length>1)
+	}
+
+
+	
+	Text {
+		id: scoreMode
+		text: "Lampen alleen als favoriet scoort: "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			left: mySelectedSceneText.left
+			top: mySelectedSceneText.bottom
+			topMargin: isNxt ? 20:16
+		}
+	}
+
+	OnOffToggle {
+		id: enableScoreModeToggle
+		height:  30
+		anchors.left: minText.left
+		//anchors.leftMargin: isNxt ? 20 : 16
+		anchors.top: scoreMode.top
+		leftIsSwitchedOn: false
+		onSelectedChangedByUser: {
+			if (isSwitchedOn) {
+				app.scoreOwnLightMode = true;
+			} else {
+				app.scoreOwnLightMode = false;
+			}
+		}
+	}
+	
+	Text {
+		id: mytimerlabel
+		//text: "Time for notification (sec): " 
+		text: "Tijd dat de lampen knipperen (sec): "
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 18:14
+		}
+		anchors {
+			top:scoreMode.bottom
+			left:scoreMode.left
+			topMargin: isNxt ? 20:16
+		}
+	}
+	
+	NewTextLabel {
+		id:minText
+		width: isNxt ? 55 : 45;  
+		height: isNxt ?40:32
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  "-"
+		anchors {
+			top: mytimerlabel.top
+			left:  mytimerlabel.right
+			leftMargin:  isNxt ? 6 :4
+		}
+		onClicked: {
+			if (lampNotificationtime>5000){
+				lampNotificationtime = lampNotificationtime -1000
+			}
+		}
+	}
+
+	Text {
+		id: mytimerlabel2
+		text:  lampNotificationtime/1000
+
+		font {
+			family: qfont.semiBold.name
+			pixelSize: isNxt ? 18:14
+		}
+		anchors {
+			top:mytimerlabel.top
+			left:minText.right
+			leftMargin:  isNxt ?  10 : 8
+		}
+	}
+	
+	NewTextLabel {
+		id:plusText
+		width: isNxt ? 55 : 45;  
+		height: isNxt ? 40:32
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  "+"
+		anchors {
+			top: minText.top
+			left: mytimerlabel2.right
+			leftMargin:isNxt ?  10 : 8
+			}
+		onClicked: {
+			if (lampNotificationtime<app.notificationtime){
+				lampNotificationtime = lampNotificationtime +1000
+			}
+		}
 	}
 }
 

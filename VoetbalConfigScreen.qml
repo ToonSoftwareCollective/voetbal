@@ -83,6 +83,39 @@ Screen {
 		}
 		visible: bridgefound
 	}
+	
+	MouseArea {
+		height : 80
+		width : 80
+		anchors {
+			bottom: parent.bottom
+			right: parent.right
+			rightMargin: 0
+			bottomMargin:0
+		}
+		onClicked: {
+			app.isDemoMode = !app.isDemoMode
+			app.showmatchesontile = false
+			console.log("clicked demo mode")
+		}
+		visible:false ////DELETE THIS to enable demo mode
+	}
+
+	Text{
+		id:demoMode
+		font.pixelSize:  isNxt ? 16 : 12
+		font.family: qfont.regular.name
+		color:  "red" 
+		text: app.isDemoMode? "Demo" : ""
+		anchors {
+			bottom: parent.bottom
+			right: parent.right
+			rightMargin: 10
+			bottomMargin:10
+	 		
+		}    		
+	}
+
 }
 
 

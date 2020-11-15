@@ -232,7 +232,7 @@ Screen {
 		id: teamText
 		color: "white"
 		width: isNxt ? parent.width/2 - 100 : parent.width/2 - 80
-		height: isNxt ? listviewContainer1.height-150  : listviewContainer1.height-120		
+		height: isNxt ? listviewContainer1.height-120  : listviewContainer1.height-100		
 		Text{
 			id: tText
 			width: parent.width
@@ -267,6 +267,7 @@ Screen {
 			selectedteams= ""
 			selectedteamsText = ""
 		}
+		visible: (selectedteamsText.length>1)
 	}
 	
 

@@ -1,3 +1,26 @@
+1.0.14
+- remove bottons not showing when lists are empty in configscreens
+- max time for hue lights set to max time of notification
+
+1.0.13
+- when scored in multiple matches at the same time, multiple notifiactions will be given
+- extra space in selected teams box
+- extra toggle switch in configscreen 3: only let lamps blink when fav team has scored
+- app : only let lamps blink when fav team has scored
+
+
+
+1.0.12
+- extra time to select the time the lamps will blink
+- configscreen 3 to select the time
+- changed oldlamparray to string type
+- fixed scenes not working (bridge not saved)
+- configscreen 3 to select save the bridge uuid correctly
+- all console.log comment lines removed
+- animation color changed to yellow (was lightgreen)
+- demomode added
+
+
 1.0.11
 -error fixed in animation
 
