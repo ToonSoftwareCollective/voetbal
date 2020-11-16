@@ -20,6 +20,8 @@ App {
 		property url 		demoUrl : "http://xxxxxxxxx.eu/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
+		property string 	appURLString : "https://github.com/ToonSoftwareCollective/toonanimations"
+		
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
@@ -53,7 +55,8 @@ App {
 		property  string	firstlinescreentext : ""
 		property  string	secondlinescreentext : ""
 		
-		property  string        oldlampString  : ""
+		property string    	oldlampString  : ""
+		property string 	githubMode : ""
 		
 		property bool goaltimerrunning : false
 		
@@ -79,6 +82,7 @@ App {
 		}
 
 		Component.onCompleted: {
+			getGithubMode()
 			try {
 				voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
 				
@@ -106,6 +110,32 @@ App {
 			registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen")
 			registry.registerWidget("screen", voetbalConfigScreenUrl2, this, "voetbalConfigScreen2")
 			registry.registerWidget("screen", voetbalConfigScreenUrl3, this, "voetbalConfigScreen3")
+		}
+		
+		function getGithubMode() {
+			if (githubMode.length <1){
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange=function() {
+					if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+						githubMode = "master"
+						console.log("Githubmode is : " + githubMode )
+					}
+				}
+			}
+			xmlhttp.open("GET", appURLString + "/blob/master/version.txt", true);
+			xmlhttp.send();
+			
+			if (githubMode.length <1){
+				var xmlhttp2 = new XMLHttpRequest();
+				xmlhttp2.onreadystatechange=function() {
+					if (xmlhttp2.readyState === 4 && xmlhttp2.status === 200) {
+						githubMode = "main"
+						console.log("Githubmode is : " + githubMode )
+					}
+				}
+				xmlhttp2.open("GET", appURLString + "/blob/main/version.txt", true);
+				xmlhttp2.send();
+			}
 		}
 
 

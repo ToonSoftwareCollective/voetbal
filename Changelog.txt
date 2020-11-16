@@ -1,4 +1,7 @@
 1.0.14
+- Github change to main added
+
+1.0.14
 - remove bottons not showing when lists are empty in configscreens
 - max time for hue lights set to max time of notification
 

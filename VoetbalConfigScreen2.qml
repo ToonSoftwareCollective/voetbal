@@ -7,7 +7,7 @@ Screen {
 	screenTitle: "Voetbal App Setup"
 
 	property string teams: ""
-	property string teamsURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/master/teamnames.txt"
+	property string teamsURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/" + app.githubMode + "/teamnames.txt"
 	property variant  teamsShort : []
 	property int  numberofItems :0
 	property string  selectedteams : ""
