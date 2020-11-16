@@ -20,8 +20,7 @@ App {
 		property url 		demoUrl : "http://xxxxxxxxx.eu/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
-		property string 	appURLString : "https://github.com/ToonSoftwareCollective/toonanimations"
-		
+		property string 	appURLString : "https://raw.githubusercontent.com/oepi-loepi/animation"
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
@@ -117,23 +116,29 @@ App {
 				var xmlhttp = new XMLHttpRequest();
 				xmlhttp.onreadystatechange=function() {
 					if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-						githubMode = "master"
-						console.log("Githubmode is : " + githubMode )
+						var resp = xmlhttp.responseText
+						if (typeof resp != undefined) {
+								githubMode = "master"
+								console.log("Voetbal Data Githubmode (main/master) is : " + githubMode )
+						}
 					}
 				}
 			}
-			xmlhttp.open("GET", appURLString + "/blob/master/version.txt", true);
+			xmlhttp.open("GET", appURLString + "/master/version.txt", true);
 			xmlhttp.send();
 			
 			if (githubMode.length <1){
 				var xmlhttp2 = new XMLHttpRequest();
 				xmlhttp2.onreadystatechange=function() {
 					if (xmlhttp2.readyState === 4 && xmlhttp2.status === 200) {
-						githubMode = "main"
-						console.log("Githubmode is : " + githubMode )
+						var resp2 = xmlhttp2.responseText
+						if (typeof resp2 != undefined) {
+								githubMode = "main"
+								console.log("Voetbal Data Githubmode (main/master) is : " + githubMode )
+						}
 					}
 				}
-				xmlhttp2.open("GET", appURLString + "/blob/main/version.txt", true);
+				xmlhttp2.open("GET", appURLString + "/main/version.txt", true);
 				xmlhttp2.send();
 			}
 		}
