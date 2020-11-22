@@ -52,7 +52,7 @@ Screen {
 		enabled : true
 		textColor : "black"
 		//buttonText:  "Setup Favourite Teams"
-		buttonText:  "Configureer Favoriete Clubs"
+		buttonText:  "Configureer Favoriete Clubs (Eredivisie)"
 		anchors {
 			top: parent.top
 			horizontalCenter: parent.horizontalCenter
@@ -71,10 +71,30 @@ Screen {
 		buttonHoverColor: "blue"
 		enabled : true
 		textColor : "black"
+		//buttonText:  "Setup Favourite Teams"
+		buttonText:  "Configureer Favoriete Landen (Europees/Wereld Kampioenschap en Olymische Spelen)"
+		anchors {
+			top: setupText.bottom
+			horizontalCenter: parent.horizontalCenter
+			topMargin: isNxt ? 5 : 4
+			}
+		onClicked: {
+			onClicked: {stage.openFullscreen(app.voetbalConfigScreenUrl4)}	
+		}
+	}
+
+	NewTextLabel {
+		id: setupText3
+		width: isNxt ? parent.width-60 : parent.width - 48
+		height: isNxt ? 100 :  80
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
 		//buttonText:  "Setup Hue Lamps"
 		buttonText:  "Configureer Hue Lampen"
 		anchors {
-			top: setupText.bottom
+			top: setupText2.bottom
 			left: setupText.left
 			topMargin: isNxt ? 5 : 4
 			}
@@ -98,7 +118,7 @@ Screen {
 			app.showmatchesontile = false
 			console.log("clicked demo mode")
 		}
-		visible:false ////DELETE THIS to enable demo mode
+		//visible:false //DELETE THIS to enable demo mode
 	}
 
 	Text{
