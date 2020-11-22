@@ -20,7 +20,7 @@ App {
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
 		//property url 		scraperUrl : "https://www.goal.com/nl/uitslagen/2020-11-21"
-		property url 		demoUrl : "http://oepiloepi.eu/competitie.html"
+		property url 		demoUrl : "http://xxxxxx.eu/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
 		property string 	appURLString : "https://raw.githubusercontent.com/oepi-loepi/animation"
@@ -250,7 +250,7 @@ App {
 																		var vyear = eventdate.substring(6, 8)
 																		var eventtime = matches[i].substring(n2, n3)
 																		
-																		if (eventstatus === "ES") {eventtime = "klaar"}
+																		if (eventstatus === "ES") {eventtime = "einde"}
 																		if (eventstatus === "UITG") {eventtime = "uitg"}
 																		if (eventstatus === "R") {eventtime = "rust"}
 																		if (eventstatus.indexOf('&#')>0){
