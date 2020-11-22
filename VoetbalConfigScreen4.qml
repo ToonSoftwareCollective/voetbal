@@ -7,26 +7,24 @@ Screen {
 	screenTitle: "Voetbal App Setup"
 
 	property string teams: ""
-	property string teamsURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/" + app.githubMode + "/teamnames.txt"
+	property string teamsURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/" + app.githubMode + "/teamnamesEK.txt"
 	property variant  teamsShort : []
 	property int  numberofItems :0
 	property string  selectedteams : ""
 	property string  selectedteamsText : ""
-	
 	property int notificationtime
 
-	
 	
 	onShown: {
 		addCustomTopRightButton("Opslaan")
 		notificationtime = app.notificationtime
 		getTeams()
-		selectedteams = app.selectedteams
+		selectedteams = app.selectedteamsEK
 		selectedTeamstoText()
 	}
 
 	onCustomButtonClicked: {
-		app.selectedteams = selectedteams
+		app.selectedteamsEK = selectedteams
 		app.notificationtime = notificationtime
 		app.saveSettings()
 		hide()
@@ -68,7 +66,7 @@ Screen {
 	Text {
 		id: mytexttop1
 		//text: "Select your favorite teams. When a goal is scored in a match of your selected team(s) you will get a notification"
-		text: "Krijg een notificatie als gescoord wordt in een wedstrijd van je favoriete club(s)"
+		text: "Krijg een notificatie als gescoord wordt in een wedstrijd van je favoriete land(en)"
 		font {
 			family: qfont.semiBold.name
 			pixelSize: isNxt ? 18:14
@@ -216,7 +214,7 @@ Screen {
 	Text {
 		id: mytext1
 		//text: "Selected Teams (shortnames): "
-		text: "Geselecteerde clubs: "
+		text: "Geselecteerde landen: "
 		font {
 			family: qfont.semiBold.name
 			pixelSize: isNxt ? 18:14
@@ -269,7 +267,6 @@ Screen {
 		}
 		visible: (selectedteamsText.length>1)
 	}
-	
 
 	Text {
 		id: mytimerlabel
@@ -343,6 +340,8 @@ Screen {
 			}
 		}
 	}
+
+	
 }
 
 

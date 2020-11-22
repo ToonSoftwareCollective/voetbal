@@ -15,11 +15,15 @@ Tile {
 	}
 
 	function updateMatchesList() {
-		if (matchModel) {
+		if ((matchModel)) {
 			matchModel.clear()
+			statusModel.clear()
 			for (var i = 0; i < app.items.length; i++) {
 				if (app.items[i].length > 2) {
 					matchModel.append({match: app.items[i]});
+					statusModel.append({status: app.timestatus[i]});
+					//console.log("app.timestatus[i] (tile): " + app.timestatus[i])
+					//console.log("app.items[i] (tile): " + app.items[i])
 				}
 			}
 		}
@@ -28,6 +32,10 @@ Tile {
 	
 	ListModel {
 		id: matchModel
+	}
+	
+	ListModel {
+		id: statusModel
 	}
 
 
@@ -58,6 +66,34 @@ Tile {
 		visible: !app.showmatchesontile
 	}
 
+
+	GridView {
+		id: statusListView
+		model: statusModel
+		delegate: Text {
+				id: mytext2
+				text: status
+				color: (typeof dimmableColors !== 'undefined') ? dimmableColors.tileTextColor : colors.tileTextColor
+				font {
+					family: qfont.semiBold.name
+					pixelSize: app.sizeoftilefont
+				}
+				anchors.right: parent.right
+			}
+
+		flow: GridView.TopToBottom
+		cellWidth: parent.width
+		cellHeight: isNxt ? parseInt(195/app.items.length) : parseInt(156/app.items.length)
+		height :  isNxt ? parent.height-10 : parent.height-8
+		width :  isNxt ? app.sizeoftilefont * 1.5 : app.sizeoftilefont * 1.2
+		anchors {
+			top: parent.top
+			left: parent.left
+			leftMargin:  isNxt ? (app.sizeoftilefont * 1.5)+5 : (app.sizeoftilefont * 1.2)+4
+			topMargin: isNxt? 10: 8
+		}
+		visible: app.showmatchesontile
+	}
 	
 	GridView {
 		id: matchListView
@@ -75,14 +111,13 @@ Tile {
 
 		flow: GridView.TopToBottom
 		cellWidth: parent.width
-		cellHeight: isNxt ? parseInt(195/app.items.length) : parseInt(156/app.items.length)
-		height :  isNxt ? parent.height-10 : parent.height-8
-		width :  isNxt ?  parent.width-30 :  parent.width-24
+		cellHeight: statusListView.cellHeight
+		height :   statusListView.height
+		width :  isNxt ?  parent.width-statusListView.width-30 :  parent.width-statusListView.width-24
 		anchors {
-			top: parent.top
-			left: parent.left
-			leftMargin:  isNxt? 20 : 16
-			topMargin: isNxt? 10: 8
+			top: statusListView.top
+			left: statusListView.right
+			leftMargin:  isNxt? 16: 16
 		}
 		visible: app.showmatchesontile
 	}
