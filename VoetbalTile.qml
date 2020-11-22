@@ -89,8 +89,7 @@ Tile {
 		anchors {
 			top: parent.top
 			left: parent.left
-			//leftMargin:  isNxt ? (app.sizeoftilefont * 1.5)+5 : (app.sizeoftilefont * 1.2)+4
-			leftMargin:  isNxt ? 20: 16
+			leftMargin:  isNxt ? 16: 12
 			topMargin: isNxt? 10: 8
 		}
 		visible: app.showmatchesontile
@@ -118,7 +117,7 @@ Tile {
 		anchors {
 			top: statusListView.top
 			left: statusListView.right
-			leftMargin:  isNxt? 20: 16
+			leftMargin:  isNxt? 24: 20
 		}
 		visible: app.showmatchesontile
 	}
