@@ -85,7 +85,7 @@ Tile {
 		cellWidth: parent.width
 		cellHeight: isNxt ? parseInt(195/app.items.length) : parseInt(156/app.items.length)
 		height :  isNxt ? parent.height-10 : parent.height-8
-		width :  isNxt ? app.sizeoftilefont * 1.5 : app.sizeoftilefont * 1.2
+		width :  isNxt ? parseInt(app.sizeoftilefont * 1.5) : parseInt(app.sizeoftilefont * 1.2)
 		anchors {
 			top: parent.top
 			left: parent.left
@@ -117,7 +117,7 @@ Tile {
 		anchors {
 			top: statusListView.top
 			left: statusListView.right
-			leftMargin:  isNxt? 24: 20
+			leftMargin:  isNxt? 24: 16
 		}
 		visible: app.showmatchesontile
 	}
