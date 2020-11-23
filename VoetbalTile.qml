@@ -24,6 +24,7 @@ Tile {
 					statusModel.append({status: app.timestatus[i]});
 					//console.log("app.timestatus[i] (tile): " + app.timestatus[i])
 					//console.log("app.items[i] (tile): " + app.items[i])
+					//console.log("app.showmatchesontile: " + app.showmatchesontile)
 				}
 			}
 		}

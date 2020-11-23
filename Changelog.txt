@@ -1,5 +1,6 @@
 1.0.18
 - minor change in column left margin on tile
+-minor change in tile when no matches today
 
 1.0.17
 - European/World footbal added
