@@ -379,7 +379,13 @@ App {
 																						animationscreen.animationInterval= isNxt ? 100000 : 100000
 																						animationscreen.isVisibleinDimState= true	
 																						animationscreen.animationRunning= true;
-																																							
+
+																						// fire signal for integration with sonos app if the resourcefile supports it
+																						try{
+																							animationscreen.animationsSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																						} catch(e) {
+																						}
+																
 																						///////////////////////////////////////
 																						
 																						break;

@@ -1,3 +1,6 @@
+1.0.19
+- added sonos integration to play live match updates over the speakers), sonos app needed as well
+
 1.0.18
 - minor change in column left margin on tile
 -minor change in tile when no matches today
