@@ -20,7 +20,7 @@ App {
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
 		//property url 		scraperUrl : "https://www.goal.com/nl/uitslagen/2020-11-21"
-		property url 		demoUrl : "http://xxxxxx.eu/competitie.html"
+		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
 		property string 	appURLString : "https://raw.githubusercontent.com/oepi-loepi/animation"
@@ -379,7 +379,13 @@ App {
 																						animationscreen.animationInterval= isNxt ? 100000 : 100000
 																						animationscreen.isVisibleinDimState= true	
 																						animationscreen.animationRunning= true;
-																																							
+
+																						// fire signal for integration with sonos app if the resourcefile supports it
+																						try{
+																							animationscreen.animationsSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																						} catch(e) {
+																						}
+																
 																						///////////////////////////////////////
 																						
 																						break;
