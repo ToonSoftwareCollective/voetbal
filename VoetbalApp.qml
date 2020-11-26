@@ -195,6 +195,7 @@ App {
 											
 									sizeoftilefont=20
 									calculatedfontzize-20
+									showmatchesontile = false	
 														
 									var found = 2
 
@@ -275,19 +276,12 @@ App {
 																		var outplayer = matches[i].substring(n25, n26)
 																		
 																		items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
+																		showmatchesontile = true
 																		timestatus[matchnumber] = eventtime
 																		
 																		var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
 																		if (sizeoftilefont > calculatedfontzize){
 																			sizeoftilefont=calculatedfontzize
-																		}
-																		
-																		if ((items[matchnumber].length)>2){
-																			showmatchesontile = true
-																			//console.log("show items on tile")
-																		}else{
-																			showmatchesontile = false
-																			//console.log("do not show items on tile")
 																		}
 
 																		var newscoretotal = parseInt(homescore) + parseInt(outscore)
@@ -405,7 +399,7 @@ App {
 																}//end of while
 														}//eredivisie found
 									}  //next competion
-								isFirstRun = false	
+								isFirstRun = false								
 								matchesUpdated()
 								
 						}//xhr status = 200
