@@ -382,7 +382,7 @@ App {
 
 																						// fire signal for integration with sonos app if the resourcefile supports it
 																						try{
-																							animationscreen.animationsSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																							tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
 																						} catch(e) {
 																						}
 																

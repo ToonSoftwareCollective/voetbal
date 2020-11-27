@@ -1,4 +1,4 @@
-1.0.19
+1.0.20
 - added sonos integration to play live match updates over the speakers), sonos app needed as well
 
 1.0.18
