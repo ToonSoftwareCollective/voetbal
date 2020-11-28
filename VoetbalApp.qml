@@ -19,11 +19,13 @@ App {
 		property		    VoetbalConfigScreen4 voetbalConfigScreen4
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
 		//property url 		scraperUrl : "https://www.goal.com/nl/uitslagen/2020-11-21"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
 		property string 	appURLString : "https://raw.githubusercontent.com/oepi-loepi/animation"
+		property string     teamsCLandELURL : "https://raw.githubusercontent.com/ToonSoftwareCollective/toonanimations/main/teamnamesCL-EL.txt"
 
 		property int 		i
 		property variant 	items: ["","","","","","","","","",""]
@@ -40,6 +42,7 @@ App {
 		property  string	scoringTeam : ""
 		property  string	selectedteams : ""
 		property  string	selectedteamsEK : ""
+		property  string	teamsCLandEL : ""
 		property  string    selectedlampsbyuuid : ""
 		property  string    selectedlampsbyname  : ""
 		property  string    selectedscenebyuuid : ""
@@ -61,7 +64,6 @@ App {
 		property  string	secondlinescreentext : ""
 		
 		property string    	oldlampString  : ""
-		property string 	githubMode : ""
 		
 		property bool goaltimerrunning : false
 		
@@ -88,7 +90,6 @@ App {
 		}
 
 		Component.onCompleted: {
-			getGithubMode()
 			try {
 				voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
 				
@@ -111,7 +112,30 @@ App {
 			}
 		}
 
-
+		function getTeamsCLandEL(){
+			teamsCLandEL : ""
+			var xmlhttp = new XMLHttpRequest()
+			xmlhttp.onreadystatechange=function() {
+				if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+					teamsCLandEL = xmlhttp.responseText
+					//console.log("teamsCLandEL : " + teamsCLandEL)
+				}
+			}
+			xmlhttp.open("GET",teamsCLandELURL, true)
+			xmlhttp.send()
+		}
+		
+		Timer {
+			id: getTeamsCLandELTimer   //interval to get the new teams from EL and CL
+			interval: 86400000  //1 x per day
+			repeat: true
+			running: true
+			triggeredOnStart: true
+			onTriggered: {
+				getTeamsCLandEL()
+			}
+		}
+		
 		function init() {
 			registry.registerWidget("tile", tileUrl, this, "voetbalTile", {thumbLabel: qsTr("Voetbal"), thumbIcon: thumbnailIcon, thumbCategory: "general", thumbWeight: 30, baseTileWeight: 10, baseTileSolarWeight: 10, thumbIconVAlignment: "center"})
 			registry.registerWidget("screen", voetbalConfigScreenUrl, this, "voetbalConfigScreen")
@@ -120,39 +144,6 @@ App {
 			registry.registerWidget("screen", voetbalConfigScreenUrl4, this, "voetbalConfigScreen4")
 		}
 		
-		function getGithubMode() {
-			if (githubMode.length <1){
-				var xmlhttp = new XMLHttpRequest();
-				xmlhttp.onreadystatechange=function() {
-					if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-						var resp = xmlhttp.responseText
-						if (typeof resp != undefined) {
-								githubMode = "master"
-								//console.log("Voetbal Data Githubmode (main/master) is : " + githubMode )
-						}
-					}
-				}
-			}
-			xmlhttp.open("GET", appURLString + "/master/version.txt", true);
-			xmlhttp.send();
-			
-			if (githubMode.length <1){
-				var xmlhttp2 = new XMLHttpRequest();
-				xmlhttp2.onreadystatechange=function() {
-					if (xmlhttp2.readyState === 4 && xmlhttp2.status === 200) {
-						var resp2 = xmlhttp2.responseText
-						if (typeof resp2 != undefined) {
-								githubMode = "main"
-								//console.log("Voetbal Data Githubmode (main/master) is : " + githubMode )
-						}
-					}
-				}
-				xmlhttp2.open("GET", appURLString + "/main/version.txt", true);
-				xmlhttp2.send();
-			}
-		}
-
-
 		function getURL() {
 				if (isDemoMode){
 					selectedUrl = demoUrl
@@ -198,6 +189,8 @@ App {
 									showmatchesontile = false	
 														
 									var found = 2
+									var matchnumber =0
+									i=0
 
 									var n201 = xhr2.responseText.indexOf('<div class=\"competition-matches\">') + 1
 									var n202 = xhr2.responseText.indexOf('<div class=\"widget-footer\">',n201)
@@ -209,22 +202,22 @@ App {
 																						
 														var competitionblock = compwrapperarray[competitioncount]
 														//console.log("competitionblock :  "  + competitionblock)
-														
-														i=0
 														found = 2
-														
+
 														var eredivipointer = competitionblock.toLowerCase().indexOf('>eredi') 
 														var ekpointer =competitionblock.toLowerCase().indexOf('>europees') 
 														var wkpointer =competitionblock.toLowerCase().indexOf('>wereldkamp') 
-														var olypointer =competitionblock.toLowerCase().indexOf('>olympische') 
+														var olypointer =competitionblock.toLowerCase().indexOf('>olympische')
+														var clpointer =competitionblock.toLowerCase().indexOf('>uefa cham')
+														var elpointer =competitionblock.toLowerCase().indexOf('>uefa euro')
 														
-														if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1){
+														if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1){
 																//console.log("competition found today ")
-																if (eredivipointer>1){compmodus = "club"}
+																if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ){compmodus = "club"}
 																if (ekpointer>1||wkpointer>1||olypointer>1){compmodus = "land"}
+						
 																//console.log("competitiemodus :  "  + compmodus)
-																
-																var matchnumber =0
+
 																var matches = competitionblock.split('match-row__data')
 																var matchcounter = matches.length
 																//console.log("matchcounter :  "  + matchcounter)
@@ -234,7 +227,8 @@ App {
 																	if (found>1){
 
 																		//console.log("matches[i], competitioncount :  "  + competitioncount)
-
+																		var matchCLorEL = false
+																		
 																		var n101 = matches[i].indexOf('match-row__state') + 18
 																		var n102 = matches[i].indexOf('</',n101)
 																		var eventstatus = matches[i].substring(n101, n102)																	
@@ -275,135 +269,158 @@ App {
 																		var n26 = matches[i].indexOf('</',n25)
 																		var outplayer = matches[i].substring(n25, n26)
 																		
-																		items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
-																		showmatchesontile = true
-																		timestatus[matchnumber] = eventtime
-																		
-																		var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
-																		if (sizeoftilefont > calculatedfontzize){
-																			sizeoftilefont=calculatedfontzize
-																		}
-
-																		var newscoretotal = parseInt(homescore) + parseInt(outscore)
-																		if (newscoretotal == 0) {oldscoretotal[i]=0}
-																		
-																		//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
-																		
-																		if ((oldscoretotal[i] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)){   //new goal scored this match
-																			if ((oldhomescore[i] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
-																				scoringTeam = homeplayer
-																			}
-																			
-																			if ((oldoutscore[i] != outscore) && (outscore>0)){ //new goal scored this match by outplayer
-																				scoringTeam = outplayer
-																			}
-																			favscored=false
-								
-																			if (!isFirstRun){
-																				
-																				//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
-																				//console.log("selectedteams: " + selectedteams)
-																				
-																				if (compmodus == "club"){
-																					var teamsarray = selectedteams.split(';')
-																				}else{
-																					var teamsarray = selectedteamsEK.split(';')
+																		/////////////////////CHECK IF CL or EL TEAM HERE ///////////////////////////////////////////
+																		if (clpointer>-1 || elpointer>-1){
+																			var combiteam = homeplayer + outplayer
+																			//combiteam = combiteam.toLowerCase()
+																			var teamsCLandELarray = teamsCLandEL.split(';')
+																			for(var y = 0;y < teamsCLandELarray.length;y++){
+																				var teamcheck = teamsCLandELarray[y].toLowerCase()
+																				//console.log("teamcheck : " + teamcheck )
+																				if(combiteam.toLowerCase().indexOf(teamcheck) > -1){
+																					matchCLorEL = true
+																					//console.log("match found : " + homeplayer + " " + outplayer )
 																				}
-
-																				//console.log("teamsarray.length: " + teamsarray.length)
-																				for(var x = 0;x < teamsarray.length;x++){
-																					var teamcheck = teamsarray[x].toLowerCase()
-																					//console.log("checking team: " + teamcheck)
-																					var combiteam = homeplayer + outplayer
-																					combiteam = combiteam.toLowerCase()
-																					//console.log("combi team: " + combiteam)
-																					if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
-																						///////////////////////////////////////
-																						////SPECIAL ACTION WHEN GOAL HERE!!!!!!
-																						
-																						isInNotificationMode = true
-																						favscored=false
-																						
-																						//////////////BLINK LAMPS////////////////////////
-																						if (scoreOwnLightMode){
-																							var teamsarray2 = selectedteams.split(';')
-																							for(var sctem = 0;sctem  < teamsarray2.length;sctem ++){
-																								var teamcheck2 = teamsarray2[sctem].toLowerCase()
-																								var scoringTeam = scoringTeam.toLowerCase()
-																								if((scoringTeam.indexOf(teamcheck2) != -1)  && teamcheck2.length > 2){
-																									favscored=true
-																								}	
-																							}
-																						}else{
-																							favscored=true
-																						}
-																						
-																						if (favscored){
-																							oldlampString = ""
-																								for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
-																								var lamp = lampstatus[lampcount]
-																								//console.log("Old lamp State:  " + lampstatus[lampcount])
-																								if (oldlampString.length<1){
-																									oldlampString = lampstatus[lampcount]
-																								}else{
-																									oldlampString += ";" + lampstatus[lampcount]
-																								}
-																							}	
-																							//console.log("oldlampString:  " + oldlampString)
-																							
-																							if(selectedlampsbyuuid.length>0){
-																								if (selectedscenebyuuid.length>0){ //select new special scene
-																									var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
-																									msg.addArgument("scene",  parseInt(selectedscenebyuuid));
-																									bxtClient.sendMsg(msg);
-																								}
-																								//console.log("Blinking started");
-																								lampblinkTimer.running = true
-																								lampTimer.running = true
-																							}
-																						}
-																						//////////////CREATE SCREEN NOTIFICATION////////////////////////
-																						
-																						console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
-
-																						var setJson = {
-																							"teams" : homeplayer + " - " + outplayer,
-																							"score" : homescore + " - " + outscore
-																						}
-																						var doc = new XMLHttpRequest()
-																						doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
-																						doc.send(JSON.stringify(setJson))
-						
-																						goalTimer.running = true
-																						animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
-																						animationscreen.animationInterval= isNxt ? 100000 : 100000
-																						animationscreen.isVisibleinDimState= true	
-																						animationscreen.animationRunning= true;
-
-																						// fire signal for integration with sonos app if the resourcefile supports it
-																						try{
-																							tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
-																						} catch(e) {
-																						}
-																
-																						///////////////////////////////////////
-																						
-																						break;
-																						
-																					}//match of team forund in new score match
-																				}//for each teamsarray
-																			
-																			}//isFirstRun?
-																			
-																			oldscoretotal[i] = newscoretotal
-																			oldhomescore[i]=homescore
-																			oldoutscore[i]=outscore
+																			}
+																		}
+																		//console.log("matchCLorEL : " + matchCLorEL )
+																		if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL){
 																		
-																		} //oldscore!=newscore
+																			////////////////////////////////////////////////////////////////////////////////////////////
+																			////////////////////////////////////////////////////////////////////////////////////////////
+																			
+																			
+																			items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
+																			showmatchesontile = true
+																			timestatus[matchnumber] = eventtime
+																			
+																			var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
+																			if (sizeoftilefont > calculatedfontzize){
+																				sizeoftilefont=calculatedfontzize
+																			}
+
+																			var newscoretotal = parseInt(homescore) + parseInt(outscore)
+																			if (newscoretotal == 0) {oldscoretotal[matchnumber]=0}
+																			
+																			//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																			//console.log("(oldscoretotal[matchnumber] : "  + oldscoretotal[matchnumber])
+																			
+																			if ((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)){   //new goal scored this match
+																				if ((oldhomescore[matchnumber] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
+																					scoringTeam = homeplayer
+																				}
+																				
+																				if ((oldoutscore[matchnumber] != outscore) && (outscore>0)){ //new goal scored this match by outplayer
+																					scoringTeam = outplayer
+																				}
+																				favscored=false
+									
+																				if (!isFirstRun){
+																					
+																					//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																					//console.log("selectedteams: " + selectedteams)
+																					
+																					if (compmodus == "club"){
+																						var teamsarray = selectedteams.split(';')
+																					}else{
+																						var teamsarray = selectedteamsEK.split(';')
+																					}
+
+																					//console.log("teamsarray.length: " + teamsarray.length)
+																					for(var x = 0;x < teamsarray.length;x++){
+																						var teamcheck = teamsarray[x].toLowerCase()
+																						//console.log("checking team: " + teamcheck)
+																						var combiteam = homeplayer + outplayer
+																						combiteam = combiteam.toLowerCase()
+																						//console.log("combi team: " + combiteam)
+																						if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+																							///////////////////////////////////////
+																							////SPECIAL ACTION WHEN GOAL HERE!!!!!!
+																							
+																							isInNotificationMode = true
+																							favscored=false
+																							
+																							//////////////BLINK LAMPS////////////////////////
+																							if (scoreOwnLightMode){
+																								var teamsarray2 = selectedteams.split(';')
+																								for(var sctem = 0;sctem  < teamsarray2.length;sctem ++){
+																									var teamcheck2 = teamsarray2[sctem].toLowerCase()
+																									scoringTeam = scoringTeam.toLowerCase()
+																									if((scoringTeam.indexOf(teamcheck2) != -1)  && teamcheck2.length > 2){
+																										favscored=true
+																									}	
+																								}
+																							}else{
+																								favscored=true
+																							}
+																							
+																							if (favscored){
+																								oldlampString = ""
+																									for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
+																									var lamp = lampstatus[lampcount]
+																									//console.log("Old lamp State:  " + lampstatus[lampcount])
+																									if (oldlampString.length<1){
+																										oldlampString = lampstatus[lampcount]
+																									}else{
+																										oldlampString += ";" + lampstatus[lampcount]
+																									}
+																								}	
+																								//console.log("oldlampString:  " + oldlampString)
+																								
+																								if(selectedlampsbyuuid.length>0){
+																									if (selectedscenebyuuid.length>0){ //select new special scene
+																										var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
+																										msg.addArgument("scene",  parseInt(selectedscenebyuuid));
+																										bxtClient.sendMsg(msg);
+																									}
+																									//console.log("Blinking started");
+																									lampblinkTimer.running = true
+																									lampTimer.running = true
+																								}
+																							}
+																							//////////////CREATE SCREEN NOTIFICATION////////////////////////
+																							
+																							console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+
+																							var setJson = {
+																								"teams" : homeplayer + " - " + outplayer,
+																								"score" : homescore + " - " + outscore
+																							}
+																							var doc = new XMLHttpRequest()
+																							doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
+																							doc.send(JSON.stringify(setJson))
+							
+																							goalTimer.running = true
+																							animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
+																							animationscreen.animationInterval= isNxt ? 100000 : 100000
+																							animationscreen.isVisibleinDimState= true	
+																							animationscreen.animationRunning= true;
+
+																							// fire signal for integration with sonos app if the resourcefile supports it
+																							try{
+																								tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																							} catch(e) {
+																							}
+																	
+																							///////////////////////////////////////
+																							
+																							break;
+																							
+																						}//match of team forund in new score match
+																					}//for each teamsarray
+																				
+																				}//isFirstRun?
+																				
+																				oldscoretotal[matchnumber] = newscoretotal
+																				oldhomescore[matchnumber]=homescore
+																				oldoutscore[matchnumber]=outscore
+																			
+																			} //oldscore!=newscore
+																		}//eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL
+																		matchnumber++
 																	}//row found
-																	matchnumber++	
 																}//end of while
-														}//eredivisie found
+														}//eredivisie, ek, wk, olympisch, cl or el found
 									}  //next competion
 								isFirstRun = false								
 								matchesUpdated()
@@ -554,4 +571,6 @@ App {
 			doc.open("PUT", "file:///mnt/data/tsc/voetbal_userSettings.json")
 			doc.send(JSON.stringify(setJson))
 		}
+		
+		
 	}

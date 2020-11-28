@@ -1,3 +1,7 @@
+1.0.21
+- all to github main only
+- Eufa Champions League  en Eufa Europe League added
+
 1.0.20
 - added sonos integration to play live match updates over the speakers), sonos app needed as well
 
