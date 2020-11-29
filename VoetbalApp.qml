@@ -22,8 +22,8 @@ App {
 		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
 		property		    VoetbalConfigScreen4 voetbalConfigScreen4
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
-		//property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
-		property url 		scraperUrl :"http://localhost/tsc/competitie.html"
+		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
 		//property url 		scraperUrl : "https://www.goal.com/nl/uitslagen/2020-11-21"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl

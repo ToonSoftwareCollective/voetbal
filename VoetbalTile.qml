@@ -163,7 +163,7 @@ Tile {
 	
 	Timer {
 		id: snoozeTimer   //interval to scrape data
-		interval: 60000
+		interval:7200000
 		repeat: false
 		running: false
 		triggeredOnStart: false
