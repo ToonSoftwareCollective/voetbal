@@ -1,3 +1,9 @@
+1.0.23
+- size of tilefont maximised
+- cellHeight of statuslistview in tile made fixed
+- blinkLamps and createScreenNotification to function
+- comments added
+
 1.0.22
 - fixed tile layout 
 

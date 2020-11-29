@@ -1,3 +1,6 @@
+//11-2020
+//by oepi-loepi and ToonzDev
+
 import QtQuick 2.1
 import qb.components 1.0
 import qb.base 1.0;
@@ -20,7 +23,6 @@ App {
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
 		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
-		//property url 		scraperUrl : "https://www.goal.com/nl/uitslagen/2020-11-21"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
@@ -270,6 +272,8 @@ App {
 																		var outplayer = matches[i].substring(n25, n26)
 																		
 																		/////////////////////CHECK IF CL or EL TEAM HERE ///////////////////////////////////////////
+																		//only add CL and EL when they are teams in the Dutch Competition
+																		
 																		if (clpointer>-1 || elpointer>-1){
 																			var combiteam = homeplayer + outplayer
 																			//combiteam = combiteam.toLowerCase()
@@ -286,21 +290,25 @@ App {
 																		//console.log("matchCLorEL : " + matchCLorEL )
 																		if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL){
 																		
-																			////////////////////////////////////////////////////////////////////////////////////////////
-																			////////////////////////////////////////////////////////////////////////////////////////////
-																			
+																			//add the match to the tile
 																			
 																			items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 																			showmatchesontile = true
 																			timestatus[matchnumber] = eventtime
 																			
+																			//calculate the fontsice for the tile
 																			var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
+																			if (isNxt & sizeoftilefont>17) {sizeoftilefont = 17}
+																			if (!isNxt & sizeoftilefont>13) {sizeoftilefont = 13}
 																			if (sizeoftilefont > calculatedfontzize){
 																				sizeoftilefont=calculatedfontzize
 																			}
 
+																			
+																			//check is there is a new goal
+
 																			var newscoretotal = parseInt(homescore) + parseInt(outscore)
-																			if (newscoretotal == 0) {oldscoretotal[matchnumber]=0}
+																			if (newscoretotal == 0) {oldscoretotal[matchnumber]=0}  //reset the oldscoretotal when the sum =0 (new match)
 																			
 																			//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																			//console.log("(oldscoretotal[matchnumber] : "  + oldscoretotal[matchnumber])
@@ -320,13 +328,16 @@ App {
 																					//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																					//console.log("selectedteams: " + selectedteams)
 																					
+																					
+																					//clubcompetition or landcompetion?
+																					
 																					if (compmodus == "club"){
 																						var teamsarray = selectedteams.split(';')
 																					}else{
 																						var teamsarray = selectedteamsEK.split(';')
 																					}
 
-																					//console.log("teamsarray.length: " + teamsarray.length)
+																					//check if in the teams of the match where the goal fell one of the favourite teams is playing
 																					for(var x = 0;x < teamsarray.length;x++){
 																						var teamcheck = teamsarray[x].toLowerCase()
 																						//console.log("checking team: " + teamcheck)
@@ -334,79 +345,23 @@ App {
 																						combiteam = combiteam.toLowerCase()
 																						//console.log("combi team: " + combiteam)
 																						if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
-																							///////////////////////////////////////
+																							//goal fell in a match where one of the favourite clubs is playing
 																							////SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																							
 																							isInNotificationMode = true
-																							favscored=false
 																							
-																							//////////////BLINK LAMPS////////////////////////
-																							if (scoreOwnLightMode){
-																								var teamsarray2 = selectedteams.split(';')
-																								for(var sctem = 0;sctem  < teamsarray2.length;sctem ++){
-																									var teamcheck2 = teamsarray2[sctem].toLowerCase()
-																									scoringTeam = scoringTeam.toLowerCase()
-																									if((scoringTeam.indexOf(teamcheck2) != -1)  && teamcheck2.length > 2){
-																										favscored=true
-																									}	
-																								}
-																							}else{
-																								favscored=true
-																							}
-																							
-																							if (favscored){
-																								oldlampString = ""
-																									for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
-																									var lamp = lampstatus[lampcount]
-																									//console.log("Old lamp State:  " + lampstatus[lampcount])
-																									if (oldlampString.length<1){
-																										oldlampString = lampstatus[lampcount]
-																									}else{
-																										oldlampString += ";" + lampstatus[lampcount]
-																									}
-																								}	
-																								//console.log("oldlampString:  " + oldlampString)
-																								
-																								if(selectedlampsbyuuid.length>0){
-																									if (selectedscenebyuuid.length>0){ //select new special scene
-																										var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
-																										msg.addArgument("scene",  parseInt(selectedscenebyuuid));
-																										bxtClient.sendMsg(msg);
-																									}
-																									//console.log("Blinking started");
-																									lampblinkTimer.running = true
-																									lampTimer.running = true
-																								}
-																							}
-																							//////////////CREATE SCREEN NOTIFICATION////////////////////////
-																							
-																							console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																							//////////////BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION ///////////////////////
+																							blinkLamps()
+																							createScreenNotification(homeplayer, outplayer, homescore, outscore)
 
-																							var setJson = {
-																								"teams" : homeplayer + " - " + outplayer,
-																								"score" : homescore + " - " + outscore
-																							}
-																							var doc = new XMLHttpRequest()
-																							doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
-																							doc.send(JSON.stringify(setJson))
-							
-																							goalTimer.running = true
-																							animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
-																							animationscreen.animationInterval= isNxt ? 100000 : 100000
-																							animationscreen.isVisibleinDimState= true	
-																							animationscreen.animationRunning= true;
-
-																							// fire signal for integration with sonos app if the resourcefile supports it
 																							try{
 																								tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
 																							} catch(e) {
 																							}
-																	
-																							///////////////////////////////////////
 																							
 																							break;
 																							
-																						}//match of team forund in new score match
+																						}//match of team fav in new score match
 																					}//for each teamsarray
 																				
 																				}//isFirstRun?
@@ -432,6 +387,69 @@ App {
 				xhr2.send()
 		}
 		
+
+		
+		function createScreenNotification(homeplayer, outplayer, homescore, outscore){
+			console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+			var setJson = {
+				"teams" : homeplayer + " - " + outplayer,
+				"score" : homescore + " - " + outscore
+			}
+			var doc = new XMLHttpRequest()
+			doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
+			doc.send(JSON.stringify(setJson))
+
+			//console.log("Showing animation")
+			goalTimer.running = true
+			animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
+			animationscreen.animationInterval= isNxt ? 100000 : 100000
+			animationscreen.isVisibleinDimState= true
+			animationscreen.animationRunning= true;
+		}
+		
+		function blinkLamps(){
+			favscored=false
+			if (scoreOwnLightMode){
+				var teamsarray2 = selectedteams.split(';')
+				for(var sctem = 0;sctem  < teamsarray2.length;sctem ++){
+					var teamcheck2 = teamsarray2[sctem].toLowerCase()
+					scoringTeam = scoringTeam.toLowerCase()
+					if((scoringTeam.indexOf(teamcheck2) != -1)  && teamcheck2.length > 2){
+						favscored=true
+					}	
+				}
+			}else{
+				favscored=true
+			}
+			
+			if (favscored){
+				oldlampString = ""
+				for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
+					var lamp = lampstatus[lampcount]
+					//console.log("Old lamp State:  " + lampstatus[lampcount])
+					if (oldlampString.length<1){
+						oldlampString = lampstatus[lampcount]
+					}else{
+						oldlampString += ";" + lampstatus[lampcount]
+					}
+				}	
+				//console.log("oldlampString:  " + oldlampString)
+				
+				if(selectedlampsbyuuid.length>0){
+					if (selectedscenebyuuid.length>0){ //select new special scene
+						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, bridgeuuid, null, "LoadScene");
+						msg.addArgument("scene",  parseInt(selectedscenebyuuid));
+						bxtClient.sendMsg(msg);
+					}
+					//console.log("Blinking started");
+					lampblinkTimer.running = true
+					lampTimer.running = true
+				}
+			}
+
+		}
+		
+
 		function getLampStates(update){											
 			for (var lampc = 0; lampc < lampstatus.length; lampc++) lampstatus[lampc] =""  //clear array
 			x = 0
