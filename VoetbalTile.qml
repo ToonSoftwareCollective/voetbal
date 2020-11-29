@@ -79,7 +79,7 @@ Tile {
 					family: qfont.semiBold.name
 					pixelSize: app.sizeoftilefont
 				}
-				anchors.right: parent.right
+				anchors.left: parent.left
 			}
 
 		flow: GridView.TopToBottom
