@@ -176,6 +176,7 @@ App {
 				}else{
 					selectedUrl = scraperUrl
 				}
+				snoozevisible = false
 				var xhr2 = new XMLHttpRequest();
 				xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 				xhr2.onreadystatechange = function() {
@@ -212,12 +213,12 @@ App {
 											
 									sizeoftilefont=20
 									calculatedfontzize-20
-									showmatchesontile = false	
+									showmatchesontile = false
+									newmatchstate = ""
 														
 									var found = 2
 									var matchnumber =0
 									i=0
-									snoozevisible: false
 
 									var n201 = xhr2.responseText.indexOf('<div class=\"competition-matches\">') + 1
 									var n202 = xhr2.responseText.indexOf('<div class=\"widget-footer\">',n201)
@@ -338,8 +339,10 @@ App {
 																				var teamcheck = teamsarray[x].toLowerCase()
 																				var combiteam = homeplayer + outplayer
 																				combiteam = combiteam.toLowerCase()
-																				if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){							
-																					if (newmatchstate == "PLAY"  & (sonosfound || selectedlampsbyuuid.length>2)){snoozevisible=true}
+																				if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+																					if (newmatchstate == "PLAY"  & (sonosfound || selectedlampsbyuuid.length>2)){
+																						snoozevisible=true
+																					}
 																				}
 																			}
 
