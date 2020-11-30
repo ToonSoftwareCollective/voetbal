@@ -1,4 +1,3 @@
-  
 import QtQuick 2.1
 import qb.base 1.0
 import BasicUIControls 1.0
@@ -92,7 +91,7 @@ Tile {
 			top: parent.top
 			left: parent.left
 			leftMargin:  isNxt ? 16: 12
-			topMargin: isNxt? 10: 8
+			topMargin: isNxt? 8: 6
 		}
 		visible: app.showmatchesontile
 	}
@@ -137,6 +136,38 @@ Tile {
 		onClicked: {
 			stage.openFullscreen(app.voetbalConfigScreenUrl)
 		}
+	}
+
+	
+	NewTextLabel {
+		id: snoozeText
+		width: isNxt ? 55 : 45;  
+		height: isNxt ? 40:32
+		buttonActiveColor: "lightgreen"
+		buttonHoverColor: "blue"
+		enabled : true
+		textColor : "black"
+		buttonText:  app.snooze? "aan" : "uit"
+		anchors {
+			bottom: parent.bottom
+			right: parent.right
+			rightMargin: 2
+			bottomMargin:2
+			}
+		onClicked: {
+			app.snooze = !app.snooze
+			if (app.snooze){ snoozeTimer.running = true}
+		}
+		visible: app.snoozevisible
+	}
+	
+	Timer {
+		id: snoozeTimer   //interval to scrape data
+		interval:7200000
+		repeat: false
+		running: false
+		triggeredOnStart: false
+		onTriggered: {app.snooze = false}
 	}
 		
 }

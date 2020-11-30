@@ -1,6 +1,7 @@
 //11-2020
 //by oepi-loepi and ToonzDev
 
+
 import QtQuick 2.1
 import qb.components 1.0
 import qb.base 1.0;
@@ -36,6 +37,8 @@ App {
 		property variant 	oldhomescore: [0,0,0,0,0,0,0,0,0,0]
 		property variant 	oldoutscore: [0,0,0,0,0,0,0,0,0,0]
 		
+		property string 	newmatchstate: ""
+		
 		property variant 	deviceStatusInfo: ({})
 		property variant 	hueScenes: []
 		property variant 	lampstatus: []
@@ -61,6 +64,11 @@ App {
 		property bool 		isInNotificationMode: false
 		property bool 		favscored: false
 		property bool 		scoreOwnLightMode: false
+		property bool		sonosfound: false
+		
+		property bool 		snoozevisible: false
+		property bool 		snooze: false
+		
 		
 		property  string	firstlinescreentext : ""
 		property  string	secondlinescreentext : ""
@@ -112,6 +120,7 @@ App {
 				bridgeuuid = voetbalSettingsJson['Bridgeuuid']
 			} catch(e) {
 			}
+			checkSonos()
 		}
 
 		function getTeamsCLandEL(){
@@ -126,6 +135,20 @@ App {
 			xmlhttp.open("GET",teamsCLandELURL, true)
 			xmlhttp.send()
 		}
+		
+		function checkSonos(){
+			var doc = new XMLHttpRequest();
+				doc.onreadystatechange = function() {
+						if (doc.readyState == XMLHttpRequest.DONE) {
+							var lampsfile = doc.responseText;
+							if (doc.responseText.toLowerCase().indexOf('sonos')>-1){sonosfound = true }
+						}
+				}
+			doc.open("GET", "file:////qmf/config/config_qt-gui.xml", true);
+			doc.setRequestHeader("Content-Encoding", "UTF-8");
+			doc.send();
+		}
+		
 		
 		Timer {
 			id: getTeamsCLandELTimer   //interval to get the new teams from EL and CL
@@ -146,12 +169,14 @@ App {
 			registry.registerWidget("screen", voetbalConfigScreenUrl4, this, "voetbalConfigScreen4")
 		}
 		
+
 		function getURL() {
 				if (isDemoMode){
 					selectedUrl = demoUrl
 				}else{
 					selectedUrl = scraperUrl
 				}
+				snoozevisible = false
 				var xhr2 = new XMLHttpRequest();
 				xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 				xhr2.onreadystatechange = function() {
@@ -188,7 +213,8 @@ App {
 											
 									sizeoftilefont=20
 									calculatedfontzize-20
-									showmatchesontile = false	
+									showmatchesontile = false
+									newmatchstate = ""
 														
 									var found = 2
 									var matchnumber =0
@@ -247,12 +273,14 @@ App {
 																		var vyear = eventdate.substring(6, 8)
 																		var eventtime = matches[i].substring(n2, n3)
 																		
-																		if (eventstatus === "ES") {eventtime = "einde"}
-																		if (eventstatus === "UITG") {eventtime = "uitg"}
-																		if (eventstatus === "R") {eventtime = "rust"}
+																		newmatchstate = "WAITING"																		
+																		if (eventstatus === "ES") {eventtime = "einde" ; newmatchstate = "END"}
+																		if (eventstatus === "UITG") {eventtime = "uitg" ; newmatchstate = "WAITING"}
+																		if (eventstatus === "R") {eventtime = "rust" ; newmatchstate = "PLAY"}
 																		if (eventstatus.indexOf('&#')>0){
 																			var n600= eventstatus.indexOf('&#')
 																			eventtime = eventstatus.substring(0, n600) + "'"
+																			newmatchstate = "PLAY"
 																		}
 																		
 																		var n10 = matches[i].indexOf('match-row__goals') + 18
@@ -296,7 +324,29 @@ App {
 																			showmatchesontile = true
 																			timestatus[matchnumber] = eventtime
 																			
-																			//calculate the fontsice for the tile
+																			
+																		
+																			//clubcompetition or landcompetion?
+																					
+																			if (compmodus == "club"){
+																				var teamsarray = selectedteams.split(';')
+																			}else{
+																				var teamsarray = selectedteamsEK.split(';')
+																			}
+																			
+																			//check if the state has been changed for a favourite match
+																			for(var x = 0;x < teamsarray.length;x++){
+																				var teamcheck = teamsarray[x].toLowerCase()
+																				var combiteam = homeplayer + outplayer
+																				combiteam = combiteam.toLowerCase()
+																				if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
+																					if (newmatchstate == "PLAY"  & (sonosfound || selectedlampsbyuuid.length>2)){
+																						snoozevisible=true
+																					}
+																				}
+																			}
+
+																			//calculate the fontsize for the tile
 																			var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
 																			if (isNxt & sizeoftilefont>17) {sizeoftilefont = 17}
 																			if (!isNxt & sizeoftilefont>13) {sizeoftilefont = 13}
@@ -328,14 +378,6 @@ App {
 																					//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																					//console.log("selectedteams: " + selectedteams)
 																					
-																					
-																					//clubcompetition or landcompetion?
-																					
-																					if (compmodus == "club"){
-																						var teamsarray = selectedteams.split(';')
-																					}else{
-																						var teamsarray = selectedteamsEK.split(';')
-																					}
 
 																					//check if in the teams of the match where the goal fell one of the favourite teams is playing
 																					for(var x = 0;x < teamsarray.length;x++){
@@ -351,27 +393,30 @@ App {
 																							isInNotificationMode = true
 																							
 																							//////////////BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION ///////////////////////
-																							blinkLamps()
+																							
 																							createScreenNotification(homeplayer, outplayer, homescore, outscore)
-
-																							try{
-																								tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
-																							} catch(e) {
+																							
+																							if (!snooze){
+																								blinkLamps()
+																								try{
+																									tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																								} catch(e) {
+																								}
 																							}
 																							
 																							break;
 																							
 																						}//match of team fav in new score match
 																					}//for each teamsarray
-																				
 																				}//isFirstRun?
 																				
 																				oldscoretotal[matchnumber] = newscoretotal
 																				oldhomescore[matchnumber]=homescore
 																				oldoutscore[matchnumber]=outscore
-																			
+
 																			} //oldscore!=newscore
 																		}//eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL
+																		
 																		matchnumber++
 																	}//row found
 																}//end of while
@@ -441,7 +486,7 @@ App {
 						msg.addArgument("scene",  parseInt(selectedscenebyuuid));
 						bxtClient.sendMsg(msg);
 					}
-					//console.log("Blinking started");
+					console.log("Blinking started");
 					lampblinkTimer.running = true
 					lampTimer.running = true
 				}
@@ -506,6 +551,7 @@ App {
 				bxtClient.sendMsg(msg);
 			}
 		}
+		
 		
 		Timer {
 			id: voetbalTimer   //interval to scrape data

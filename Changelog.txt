@@ -1,3 +1,10 @@
+1.0.25
+- hiding snooze button when no favourite club/land is in the match list
+
+1.0.24
+- signals to sonos and to hue to "snooze" when a new match has started
+- check if sonos has been installed on a tile
+
 1.0.23
 - size of tilefont maximised
 - cellHeight of statuslistview in tile made fixed
