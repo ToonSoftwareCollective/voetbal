@@ -23,6 +23,7 @@ App {
 		property		    VoetbalConfigScreen4 voetbalConfigScreen4
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+
 		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
@@ -36,27 +37,30 @@ App {
 		property variant 	oldscoretotal: [0,0,0,0,0,0,0,0,0,0]
 		property variant 	oldhomescore: [0,0,0,0,0,0,0,0,0,0]
 		property variant 	oldoutscore: [0,0,0,0,0,0,0,0,0,0]
-		
-		property string 	newmatchstate: ""
-		
+	
 		property variant 	deviceStatusInfo: ({})
 		property variant 	hueScenes: []
 		property variant 	lampstatus: []
 		property variant 	oldlamps: []
-		
-		property  string	scoringTeam : ""
-		property  string	selectedteams : ""
-		property  string	selectedteamsEK : ""
-		property  string	teamsCLandEL : ""
 		property  string    selectedlampsbyuuid : ""
 		property  string    selectedlampsbyname  : ""
 		property  string    selectedscenebyuuid : ""
 		property  string    selectedscenebyname  : ""
-		property  string 	compmodus : "club"
 		property  string 	bridgeuuid
+
+		property  string	scoringTeam : ""
+		property  string	selectedteams : ""
+		property  string	selectedteamsEK : ""
+		property  string	teamsCLandEL : ""
+
+		property  string 	compmodus : "club"
+		property  string 	timeStr
 		property  int		sizeoftilefont
 		property  int		notificationtime: 10000
 		property  int		lampNotificationtime:6000
+		property  int 		scrapeInterval:10000
+		
+	property  string	tileButtonInterval
 		
 		property bool		isFirstRun: true
 		property bool 		showmatchesontile: false
@@ -176,7 +180,6 @@ App {
 				}else{
 					selectedUrl = scraperUrl
 				}
-				snoozevisible = false
 				var xhr2 = new XMLHttpRequest();
 				xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 				xhr2.onreadystatechange = function() {
@@ -209,25 +212,35 @@ App {
 										<span class="match-row__team-name">PEC Zwolle</span> </a> </td> </tr> </table> </div>  </div>   </div> </div>  
 										<div class="competition-matches">                                         
 									 */
-									for (var i = 0; i < items.length; i++) items[i] =""  //clear array
-											
+
+//Reset match vars when a new scpape is starting
+									for (var i in items){ 
+										items[i] =""   //clear array
+									}  
+																			
 									sizeoftilefont=20
 									calculatedfontzize-20
 									showmatchesontile = false
-									newmatchstate = ""
+									var matchstate = ""
 														
 									var found = 2
 									var matchnumber =0
 									i=0
+									snoozevisible = false
+									if (teamsCLandEL.length>2){scrapeInterval = 14400000} //4 hours interval when no play
+//if (teamsCLandEL.length>2){scrapeInterval = 10000} //4 hours interval when no play
+									//console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
 
+
+//Check from the response if there are any competitions
 									var n201 = xhr2.responseText.indexOf('<div class=\"competition-matches\">') + 1
 									var n202 = xhr2.responseText.indexOf('<div class=\"widget-footer\">',n201)
 									var allmatches = xhr2.responseText.substring(n201, n202)
-
 									var compwrapperarray = allmatches.split('<div class=\"competition-wrapper\">')
-									//console.log("compwrapperarray.length: " + compwrapperarray.length)
-									for(var competitioncount = 0;competitioncount < compwrapperarray.length;competitioncount++){
-																						
+									//console.log("compwrapperarray.length: " + compwrapperarray.length
+
+//for each competion
+									for(var competitioncount in compwrapperarray){								
 														var competitionblock = compwrapperarray[competitioncount]
 														//console.log("competitionblock :  "  + competitionblock)
 														found = 2
@@ -238,22 +251,22 @@ App {
 														var olypointer =competitionblock.toLowerCase().indexOf('>olympische')
 														var clpointer =competitionblock.toLowerCase().indexOf('>uefa cham')
 														var elpointer =competitionblock.toLowerCase().indexOf('>uefa euro')
-														
+
+//if selected competition is a selected Dutch competition
 														if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1){
 																//console.log("competition found today ")
 																if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ){compmodus = "club"}
 																if (ekpointer>1||wkpointer>1||olypointer>1){compmodus = "land"}
 						
-																//console.log("competitiemodus :  "  + compmodus)
-
 																var matches = competitionblock.split('match-row__data')
-																var matchcounter = matches.length
-																//console.log("matchcounter :  "  + matchcounter)
-																if (matchcounter>9){matchcounter = 9}
-															    for(var i = 0; i  < matchcounter; i ++){
+																//console.log("matchcounter :  "  + matches.length)
+
+//for each match in the competition
+															    for(var i in matches){
 																	found = matches[i].indexOf('match-row__date')
 																	if (found>1){
-
+																	
+																		if (matchnumber>9){matchnumber = 9}
 																		//console.log("matches[i], competitioncount :  "  + competitioncount)
 																		var matchCLorEL = false
 																		
@@ -272,15 +285,15 @@ App {
 																		var vmonth = eventdate.substring(3, 6)
 																		var vyear = eventdate.substring(6, 8)
 																		var eventtime = matches[i].substring(n2, n3)
-																		
-																		newmatchstate = "WAITING"																		
-																		if (eventstatus === "ES") {eventtime = "einde" ; newmatchstate = "END"}
-																		if (eventstatus === "UITG") {eventtime = "uitg" ; newmatchstate = "WAITING"}
-																		if (eventstatus === "R") {eventtime = "rust" ; newmatchstate = "PLAY"}
+																																			
+																		matchstate = "WAITING"																		
+																		if (eventstatus === "ES") {eventtime = "einde" ; matchstate = "END"}
+																		if (eventstatus === "UITG") {eventtime = "uitg" ; matchstate = "XXX"}
+																		if (eventstatus === "R") {eventtime = "rust" ; matchstate = "PLAY"}
 																		if (eventstatus.indexOf('&#')>0){
 																			var n600= eventstatus.indexOf('&#')
 																			eventtime = eventstatus.substring(0, n600) + "'"
-																			newmatchstate = "PLAY"
+																			matchstate = "PLAY"
 																		}
 																		
 																		var n10 = matches[i].indexOf('match-row__goals') + 18
@@ -299,70 +312,101 @@ App {
 																		var n26 = matches[i].indexOf('</',n25)
 																		var outplayer = matches[i].substring(n25, n26)
 																		
-																		/////////////////////CHECK IF CL or EL TEAM HERE ///////////////////////////////////////////
-																		//only add CL and EL when they are teams in the Dutch Competition
 																		
+//only add CL and EL matches when they are teams playing in the Dutch Competition																
 																		if (clpointer>-1 || elpointer>-1){
 																			var combiteam = homeplayer + outplayer
 																			//combiteam = combiteam.toLowerCase()
 																			var teamsCLandELarray = teamsCLandEL.split(';')
-																			for(var y = 0;y < teamsCLandELarray.length;y++){
-																				var teamcheck = teamsCLandELarray[y].toLowerCase()
+																			for(var teamnumber in teamsCLandELarray){
+																				var teamcheck = teamsCLandELarray[teamnumber].toLowerCase()
 																				//console.log("teamcheck : " + teamcheck )
-																				if(combiteam.toLowerCase().indexOf(teamcheck) > -1){
-																					matchCLorEL = true
-																					//console.log("match found : " + homeplayer + " " + outplayer )
+																				if((combiteam.toLowerCase().indexOf(teamcheck) > -1) && teamcheck.length > 0){
+//when the teamname is short make an exact match																				
+																					if((teamcheck.length < 3 & (homeplayer.toLowerCase()==teamcheck  || outplayer.toLowerCase()==teamcheck)) || (teamcheck.length >= 3 )){
+																						matchCLorEL = true
+																						console.log("match found : " + matchnumber + " / " + homeplayer + " " + outplayer )
+																					}
 																				}
 																			}
 																		}
+																		
 																		//console.log("matchCLorEL : " + matchCLorEL )
+//when it is a valid match, do actions
 																		if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL){
 																		
-																			//add the match to the tile
-																			
+//add the match to the tile																			
 																			items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 																			showmatchesontile = true
 																			timestatus[matchnumber] = eventtime
 																			
+//calculate the fontsize for the tile
+																			var calculatedfontzize = isNxt? parseInt(490/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
+																			if (isNxt & sizeoftilefont>17) {sizeoftilefont = 17}
+																			if (!isNxt & sizeoftilefont>13) {sizeoftilefont = 13}
+																			if (sizeoftilefont > calculatedfontzize){
+																				sizeoftilefont=calculatedfontzize
+																			}
 																			
-																		
-																			//clubcompetition or landcompetion?
-																					
+//set a new timer for the scraper																			
+																			if (matchstate == "WAITING"){
+																				var hrs =  parseInt(eventtime.substring(0,2))
+																				var mins = parseInt(eventtime.substring(3,5))
+																				var timehrs =  parseInt(timeStr.substring(0,2))
+																				var timemins = parseInt(timeStr.substring(3,5))
+																				var msecondstToGo = 1000*(((hrs-timehrs-1)*3600) + ((mins-timemins+55)*60)) //secondstogo to new match - 5 minutes
+																				console.log("msecondstToGo : " + msecondstToGo + " to : " + eventtime)										
+																				if (msecondstToGo>0){
+																					if (scrapeInterval>msecondstToGo){
+																					    console.log("****TIME TO NEW MATCH ************")
+																						scrapeInterval = parseInt(msecondstToGo) //timer calculated 5 minutes before match
+																						console.log("scrapeInterval : " + scrapeInterval)
+																					}
+																				}
+																				if (msecondstToGo<=10000 & msecondstToGo>-6600000){  //5 mins before, 110 mins after start
+																						console.log("****5 MINS BEFORE TILL 30 MINS AFTER START *************")
+																						scrapeInterval = 10000//timer 10s minutes before match
+																						console.log("scrapeInterval : " + scrapeInterval)
+																				}
+																			}
+																			
+																			if (matchstate == "PLAY"){
+																				console.log("******PLAY********")
+																				scrapeInterval = 10000  //10s during match
+																			} 
+
+																			//console.log("scrapeInterval : " + scrapeInterval)
+																			
+																																				
+//clubcompetition or landcompetion?		
 																			if (compmodus == "club"){
 																				var teamsarray = selectedteams.split(';')
 																			}else{
 																				var teamsarray = selectedteamsEK.split(';')
 																			}
 																			
-																			//check if the state has been changed for a favourite match
-																			for(var x = 0;x < teamsarray.length;x++){
+																			//check if one of the favourite teams is playing
+																			for(var x in teamsarray){
 																				var teamcheck = teamsarray[x].toLowerCase()
 																				var combiteam = homeplayer + outplayer
 																				combiteam = combiteam.toLowerCase()
 																				if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
-																					if (newmatchstate == "PLAY"  & (sonosfound || selectedlampsbyuuid.length>2)){
+																					if (matchstate == "PLAY"  & (sonosfound || selectedlampsbyuuid.length>2)){
 																						snoozevisible=true
 																					}
 																				}
 																			}
 
-																			//calculate the fontsize for the tile
-																			var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + timestatus[matchnumber].length + 1)):parseInt(400/(items[matchnumber].length + timestatus[matchnumber].length + 1))
-																			if (isNxt & sizeoftilefont>17) {sizeoftilefont = 17}
-																			if (!isNxt & sizeoftilefont>13) {sizeoftilefont = 13}
-																			if (sizeoftilefont > calculatedfontzize){
-																				sizeoftilefont=calculatedfontzize
-																			}
-
-																			
-																			//check is there is a new goal
-
+//check is there is a new goal
 																			var newscoretotal = parseInt(homescore) + parseInt(outscore)
 																			if (newscoretotal == 0) {oldscoretotal[matchnumber]=0}  //reset the oldscoretotal when the sum =0 (new match)
 																			
 																			//console.log("match score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																			//console.log("(newscoretotal : "  + newscoretotal)
 																			//console.log("(oldscoretotal[matchnumber] : "  + oldscoretotal[matchnumber])
 																			
+																			//console.log( homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																				
 																			if ((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)){   //new goal scored this match
 																				if ((oldhomescore[matchnumber] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
 																					scoringTeam = homeplayer
@@ -378,28 +422,25 @@ App {
 																					//console.log("voetbal new score: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																					//console.log("selectedteams: " + selectedteams)
 																					
-
-																					//check if in the teams of the match where the goal fell one of the favourite teams is playing
-																					for(var x = 0;x < teamsarray.length;x++){
+//check if in the teams of the match where the goal fell one of the favourite teams is playing
+																					for(var x in teamsarray){
 																						var teamcheck = teamsarray[x].toLowerCase()
 																						//console.log("checking team: " + teamcheck)
 																						var combiteam = homeplayer + outplayer
 																						combiteam = combiteam.toLowerCase()
 																						//console.log("combi team: " + combiteam)
-																						if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 2){
-																							//goal fell in a match where one of the favourite clubs is playing
-																							////SPECIAL ACTION WHEN GOAL HERE!!!!!!
+																						if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 0){
+//goal fell in a match where one of the favourite clubs is playing
+//SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																							
 																							isInNotificationMode = true
 																							
-																							//////////////BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION ///////////////////////
-																							
+//BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION				
 																							createScreenNotification(homeplayer, outplayer, homescore, outscore)
-																							
 																							if (!snooze){
 																								blinkLamps()
 																								try{
-																									tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																									tscsignals.tscSignal("sonos", "Nieuwe tussenstand bij " + homeplayer + ' tegen ' + outplayer + ', het staat nu ' + homescore + ' ' + outscore);
 																								} catch(e) {
 																								}
 																							}
@@ -409,22 +450,25 @@ App {
 																						}//match of team fav in new score match
 																					}//for each teamsarray
 																				}//isFirstRun?
-																				
-																				oldscoretotal[matchnumber] = newscoretotal
-																				oldhomescore[matchnumber]=homescore
-																				oldoutscore[matchnumber]=outscore
 
 																			} //oldscore!=newscore
+																			
+																			oldscoretotal[matchnumber] = newscoretotal
+																			oldhomescore[matchnumber]=homescore
+																			oldoutscore[matchnumber]=outscore
+																			matchnumber++
+																			
 																		}//eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL
 																		
-																		matchnumber++
 																	}//row found
 																}//end of while
 														}//eredivisie, ek, wk, olympisch, cl or el found
 									}  //next competion
 								isFirstRun = false								
 								matchesUpdated()
-								
+var now2 = new Date().getTime()
+var timeStr2 = i18n.dateTime(now2, i18n.time_yes)
+tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 						}//xhr status = 200
 					}//end of xhr2.readystate
 				}//xhr onreadystate
@@ -469,7 +513,7 @@ App {
 			
 			if (favscored){
 				oldlampString = ""
-				for (var lampcount = 0; lampcount < lampstatus.length; lampcount++){
+				for (var lampcount in lampstatus){
 					var lamp = lampstatus[lampcount]
 					//console.log("Old lamp State:  " + lampstatus[lampcount])
 					if (oldlampString.length<1){
@@ -496,7 +540,7 @@ App {
 		
 
 		function getLampStates(update){											
-			for (var lampc = 0; lampc < lampstatus.length; lampc++) lampstatus[lampc] =""  //clear array
+			for (var lampc in lampstatus.length) lampstatus[lampc] =""  //clear array
 			x = 0
 			var infoList = deviceStatusInfo;
 			var infoNode = update.getChild("device", 0);
@@ -542,7 +586,7 @@ App {
 		function restorelamps(){
 			//console.log("oldlampString:  " + oldlampString)
 			var oldlampArray=oldlampString.split(';')
-			for (var lcount = 0; lcount <oldlampArray.length; lcount++){
+			for (var lcount in oldlampArray){
 				var lampoldstatus = oldlampArray[lcount]
 				var oldlampSplit=lampoldstatus.split(':')
 				//console.log("New lamp States:  " + oldlampSplit[0] + "   restoring to old situation " + oldlampSplit[1])
@@ -552,13 +596,29 @@ App {
 			}
 		}
 		
-		
 		Timer {
-			id: voetbalTimer   //interval to scrape data
-			interval: showmatchesontile? 10000: isDemoMode? 10000: 3600000  //whan there are no matches, set timer to 10 min
+			id: voetbalClock   //clock to get data on a specific time and to calculate the time to next match
+			interval: 30000 //30s interval
 			repeat: true
 			running: true
 			triggeredOnStart: true
+			onTriggered: {
+				var now = new Date().getTime()
+				timeStr = i18n.dateTime(now, i18n.time_yes)
+				console.log("time : " + timeStr)
+				if (timeStr == "01:30" || timeStr == "1:30"){  //get new matches at 01:30
+					console.log("Trigger from clock ")
+					getURL()
+				} 
+			}
+		}
+		
+		Timer {
+			id: voetbalTimer   //interval to scrape data
+			interval: scrapeInterval
+			repeat: true
+			running: true
+			triggeredOnStart: false
 			onTriggered: {getURL()}
 		}
 		
@@ -584,7 +644,7 @@ App {
 			triggeredOnStart: false
 			onTriggered: {
 					var lampsarray = selectedlampsbyuuid.split(';')
-					for(var x1 = 0;x1 < lampsarray.length;x1++){
+					for(var x1 in lampsarray){
 						var msg = bxtFactory.newBxtMessage(BxtMessage.ACTION_INVOKE, lampsarray[x1] , "SwitchPower", "SetTarget");
 						msg.addArgument("NewTargetValue", lampstate? "0": "1");
 						bxtClient.sendMsg(msg);

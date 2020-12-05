@@ -1,3 +1,10 @@
+1.0.27
+- added timers to only speed the request interval during mateched played
+
+1.0.26
+- special seach statement for AZ in CL and EL because of InternAZionale
+- moved snoozevisible to below the http request
+
 1.0.25
 - hiding snooze button when no favourite club/land is in the match list
 

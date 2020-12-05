@@ -7,7 +7,7 @@ Tile {
 	id: voetbalTile
 	
 	property bool dimState: screenStateController.dimmedColors
-
+	property bool blink:false
 	
 	Component.onCompleted: {
 		app.matchesUpdated.connect(updateMatchesList);
@@ -139,15 +139,31 @@ Tile {
 	}
 
 	
+	Rectangle { 
+		id: bulletCircle
+		width: 10 
+		height: 10 
+		anchors {
+			top: parent.top
+			right: parent.right
+			rightMargin: 2
+			topMargin:2
+		}
+		color: (app.scrapeInterval <60000 )? blink? "red" : "transparent" : "transparent"
+		radius: width*0.5 
+	}
+	
 	NewTextLabel {
 		id: snoozeText
-		width: isNxt ? 55 : 45;  
+		//width: isNxt ? 55 : 45; 
+width: parent.width - 4
 		height: isNxt ? 40:32
 		buttonActiveColor: "lightgreen"
 		buttonHoverColor: "blue"
 		enabled : true
 		textColor : "black"
-		buttonText:  app.snooze? "aan" : "uit"
+		//buttonText:  app.snooze? "aan" : "uit"
+buttonText:  app.tileButtonInterval
 		anchors {
 			bottom: parent.bottom
 			right: parent.right
@@ -158,7 +174,7 @@ Tile {
 			app.snooze = !app.snooze
 			if (app.snooze){ snoozeTimer.running = true}
 		}
-		visible: app.snoozevisible
+//visible: app.snoozevisible
 	}
 	
 	Timer {
@@ -168,6 +184,14 @@ Tile {
 		running: false
 		triggeredOnStart: false
 		onTriggered: {app.snooze = false}
+	}
+	
+	Timer {
+		id: blinkTimer   //interval to scrape data
+		interval:1000
+		repeat: true
+		running: true
+		onTriggered: {blink= !blink}
 	}
 		
 }
