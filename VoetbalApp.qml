@@ -399,7 +399,7 @@ App {
 																							if (!snooze){
 																								blinkLamps()
 																								try{
-																									tscsignals.tscSignal("sonos", homeplayer + ' tegen ' + outplayer + ' staat nu ' + homescore + ' ' + outscore);
+																									tscsignals.tscSignal("sonos", "Nieuwe tussenstand bij " + homeplayer + ' tegen ' + outplayer + ', het staat nu ' + homescore + ' ' + outscore);
 																								} catch(e) {
 																								}
 																							}
