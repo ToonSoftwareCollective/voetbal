@@ -27,7 +27,8 @@ Item {
 		onTriggered: {
 			newScores = JSON.parse(voetbalFile.read())
 			teams = newScores['teams']	
-			scores = newScores['score']	
+			scores = newScores['score']
+			console.log("Voetbal animation started")
 		}
 	}
 

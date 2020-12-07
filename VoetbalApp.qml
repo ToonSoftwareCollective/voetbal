@@ -22,9 +22,9 @@ App {
 		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
 		property		    VoetbalConfigScreen4 voetbalConfigScreen4
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
-		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+		//property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
 
-		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
+		property url 		scraperUrl :"http://localhost/tsc/competitie.html"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
@@ -79,6 +79,16 @@ App {
 		property  string	secondlinescreentext : ""
 		
 		property string    	oldlampString  : ""
+
+		property bool oldanimationRunning: false
+		property bool oldisVisibleinDimState: true
+		property int oldanimationInterval : 1000
+		property string oldqmlAnimationURL :  ""
+		property string oldqmlAnimationText : ""
+		property string oldstaticImageT1 : ""
+    		property string oldstaticImageT2 : ""
+		property string oldstaticImageT1dim : ""
+        	property string oldstaticImageT2dim : ""
 		
 		property bool goaltimerrunning : false
 		
@@ -245,10 +255,10 @@ App {
 										for(var scrapenumber in matchstates){
 											if (matchstates[scrapenumber]==="PLAY"){
 												scrapeInterval = 10000
-												//console.log("a match is still playing so interval is short ")
+												console.log("a match is still playing so interval is short ")
 											}
 										}
-										//console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
+										console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
 
 	//Check from the response if there are any competitions
 										var n201 = xhr2.responseText.indexOf('<div class=\"competition-matches\">') + 1
@@ -358,24 +368,24 @@ App {
 																					var timehrs =  parseInt(timeStr.substring(0,2))
 																					var timemins = parseInt(timeStr.substring(3,5))
 																					var msecondstToGo = 1000*(((hrs-timehrs-1)*3600) + ((mins-timemins+55)*60)) //secondstogo to new match - 5 minutes
-																					//console.log("msecondstToGo : " + msecondstToGo + " to : " + eventtime)										
+																					console.log("msecondstToGo : " + msecondstToGo + " to : " + eventtime)										
 																					if (msecondstToGo>0){
 																						if (scrapeInterval>msecondstToGo){
-																							//console.log("****TIME TO NEW MATCH ************")
+																							console.log("****TIME TO NEW MATCH ************")
 																							scrapeInterval = parseInt(msecondstToGo) //timer calculated 5 minutes before match
-																							//console.log("scrapeInterval : " + scrapeInterval)
+																							console.log("scrapeInterval : " + scrapeInterval)
 																						}
 																					}
 																					if (msecondstToGo<=10000 & msecondstToGo>-6600000){  //5 mins before, 110 mins after start
-																							//console.log("****5 MINS BEFORE TILL 30 MINS AFTER START *************")
+																							console.log("****5 MINS BEFORE TILL 30 MINS AFTER START *************")
 																							scrapeInterval = 10000//timer 10s minutes before match
 																							matchstate == "PLAY"  //set the match state to play 5 minutes before start of match
-																							//console.log("scrapeInterval : " + scrapeInterval)
+																							console.log("scrapeInterval : " + scrapeInterval)
 																					}
 																				}
 																				
 																				if (matchstate == "PLAY"){
-																					//console.log("******PLAY********")
+																					console.log("******PLAY********")
 																					scrapeInterval = 10000  //10s during match
 																				} 
 																				//console.log("scrapeInterval : " + scrapeInterval)
@@ -447,9 +457,8 @@ App {
 																							if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 0){
 	//goal fell in a match where one of the favourite clubs is playing
 	//SPECIAL ACTION WHEN GOAL HERE!!!!!!
-																								
-																								isInNotificationMode = true
-																								
+
+																								isInNotificationMode = true																							
 	//BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION				
 																								createScreenNotification(homeplayer, outplayer, homescore, outscore)
 																								if (!snooze){
@@ -495,6 +504,19 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 
 		
 		function createScreenNotification(homeplayer, outplayer, homescore, outscore){
+		
+			oldanimationRunning = animationscreen.animationRunning
+			oldisVisibleinDimState = animationscreen.isVisibleinDimState
+			oldanimationInterval = animationscreen.animationInterval
+			oldqmlAnimationURL = animationscreen.qmlAnimationURL
+			oldqmlAnimationText = animationscreen.qmlAnimationText
+			oldstaticImageT1 = animationscreen.staticImageT1
+    		oldstaticImageT2 = animationscreen.staticImageT2
+			oldstaticImageT1dim = animationscreen.staticImageT1dim
+       		oldstaticImageT2dim =animationscreen.staticImageT2dim
+			
+			animationscreen.animationRunning= false
+				
 			console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 			var setJson = {
 				"teams" : homeplayer + " - " + outplayer,
@@ -503,15 +525,9 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 			var doc = new XMLHttpRequest()
 			doc.open("PUT", "file:///HCBv2/qml/apps/voetbal/newScore.json")
 			doc.send(JSON.stringify(setJson))
-
-			//console.log("Showing animation")
-			goalTimer.running = true
-			animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
-			animationscreen.animationInterval= isNxt ? 100000 : 100000
-			animationscreen.isVisibleinDimState= true
-			animationscreen.animationRunning= true;
+			smallDelayTimer.running = true	
 		}
-		
+
 		function blinkLamps(){
 			favscored=false
 			if (scoreOwnLightMode){
@@ -642,16 +658,70 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 		}
 		
 		Timer {
+			id: smallDelayTimer   //delay to show the goal animation screen
+			interval: 100
+			repeat: false
+			running: false
+			triggeredOnStart: false
+			onTriggered: {
+				animationscreen.qmlAnimationURL= "file:///HCBv2/qml/apps/voetbal/VoetbalAnimation.qml"
+				animationscreen.animationInterval= 100000
+				animationscreen.isVisibleinDimState= true
+				if (oldanimationRunning){
+					animationscreen.staticImageT1 = oldstaticImageT1
+					animationscreen.staticImageT2 = oldstaticImageT2
+					animationscreen.staticImageT1dim = oldstaticImageT1dim
+					animationscreen.staticImageT2dim = oldstaticImageT2
+					
+				}else{
+					animationscreen.staticImageT1 = ""
+					animationscreen.staticImageT2 = ""
+					animationscreen.staticImageT1dim = ""
+					animationscreen.staticImageT2dim = ""
+				}
+				animationscreen.animationRunning= true;
+				goalTimer.running = true
+				smallDelayTimer.running = false
+			}
+		}
+		
+		Timer {
 			id: goalTimer   //delay to hide the new goal screen
 			interval: notificationtime 
 			repeat: false
 			running: false
 			triggeredOnStart: false
 			onTriggered: {
-				animationscreen.animationRunning= false;
-				animationscreen.isVisibleinDimState= false;
-				isInNotificationMode = false			
+				animationscreen.animationRunning= false
+				animationscreen.qmlAnimationURL = ""
+				smallDelayTimer2.running = true			
 				goalTimer.running = false
+			}
+		}
+		
+		Timer {
+			id: smallDelayTimer2  //delay to return to the old animation
+			interval: 3000
+			repeat: false
+			running: false
+			triggeredOnStart: false
+			onTriggered: {
+				if (oldanimationRunning){
+					animationscreen.isVisibleinDimState = oldisVisibleinDimState
+					animationscreen.animationInterval = oldanimationInterval
+					animationscreen.qmlAnimationURL = oldqmlAnimationURL
+					animationscreen.qmlAnimationText = oldqmlAnimationText
+					animationscreen.staticImageT1 = oldstaticImageT1
+					animationscreen.staticImageT2 = oldstaticImageT2
+					animationscreen.staticImageT1dim = oldstaticImageT1dim
+					animationscreen.staticImageT2dim = oldstaticImageT2dim
+					animationscreen.animationRunning = true
+				}else{
+					animationscreen.animationRunning= false
+					animationscreen.isVisibleinDimState= false
+				}
+				isInNotificationMode = false
+				smallDelayTimer2.running = false
 			}
 		}
 
