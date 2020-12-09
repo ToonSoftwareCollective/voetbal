@@ -21,9 +21,6 @@ Tile {
 				if (app.items[i].length > 2) {
 					matchModel.append({match: app.items[i]});
 					statusModel.append({status: app.timestatus[i]});
-					//console.log("app.timestatus[i] (tile): " + app.timestatus[i])
-					//console.log("app.items[i] (tile): " + app.items[i])
-					//console.log("app.showmatchesontile: " + app.showmatchesontile)
 				}
 			}
 		}
@@ -155,15 +152,13 @@ Tile {
 	
 	NewTextLabel {
 		id: snoozeText
-		//width: isNxt ? 55 : 45; 
-width: parent.width - 4
+		width: isNxt ? 55 : 45; 
 		height: isNxt ? 40:32
 		buttonActiveColor: "lightgreen"
 		buttonHoverColor: "blue"
 		enabled : true
 		textColor : "black"
-		//buttonText:  app.snooze? "aan" : "uit"
-buttonText:  app.tileButtonInterval
+		buttonText:  app.snooze? "aan" : "uit"
 		anchors {
 			bottom: parent.bottom
 			right: parent.right
@@ -174,7 +169,10 @@ buttonText:  app.tileButtonInterval
 			app.snooze = !app.snooze
 			if (app.snooze){ snoozeTimer.running = true}
 		}
-//visible: app.snoozevisible
+//options to show testtime on tile
+//width: parent.width - 4
+//buttonText:  app.tileButtonInterval
+		visible: app.snoozevisible
 	}
 	
 	Timer {

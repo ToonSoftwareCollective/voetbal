@@ -22,9 +22,9 @@ App {
 		property url 		voetbalConfigScreenUrl3 : "VoetbalConfigScreen3.qml"
 		property		    VoetbalConfigScreen4 voetbalConfigScreen4
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
-		//property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
+		property url 		scraperUrl : "https://www.goal.com/nl/live-scores"
 
-		property url 		scraperUrl :"http://localhost/tsc/competitie.html"
+		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
 		property url 		demoUrl : "http://localhost/tsc/competitie.html"
 		property url 		selectedUrl : scraperUrl
 		
@@ -60,8 +60,8 @@ App {
 		property  int		notificationtime: 10000
 		property  int		lampNotificationtime:6000
 		property  int 		scrapeInterval:10000
-		
-	property  string	tileButtonInterval
+//options to show testtime on tile		
+//property  string	tileButtonInterval
 		
 		property bool		isFirstRun: true
 		property bool 		showmatchesontile: false
@@ -255,10 +255,10 @@ App {
 										for(var scrapenumber in matchstates){
 											if (matchstates[scrapenumber]==="PLAY"){
 												scrapeInterval = 10000
-												console.log("a match is still playing so interval is short ")
+												//console.log("a match is still playing so interval is short ")
 											}
 										}
-										console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
+										//console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
 
 	//Check from the response if there are any competitions
 										var n201 = xhr2.responseText.indexOf('<div class=\"competition-matches\">') + 1
@@ -368,24 +368,24 @@ App {
 																					var timehrs =  parseInt(timeStr.substring(0,2))
 																					var timemins = parseInt(timeStr.substring(3,5))
 																					var msecondstToGo = 1000*(((hrs-timehrs-1)*3600) + ((mins-timemins+55)*60)) //secondstogo to new match - 5 minutes
-																					console.log("msecondstToGo : " + msecondstToGo + " to : " + eventtime)										
+																					//console.log("msecondstToGo : " + msecondstToGo + " to : " + eventtime)										
 																					if (msecondstToGo>0){
 																						if (scrapeInterval>msecondstToGo){
-																							console.log("****TIME TO NEW MATCH ************")
+																							//console.log("****TIME TO NEW MATCH ************")
 																							scrapeInterval = parseInt(msecondstToGo) //timer calculated 5 minutes before match
-																							console.log("scrapeInterval : " + scrapeInterval)
+																							//console.log("scrapeInterval : " + scrapeInterval)
 																						}
 																					}
 																					if (msecondstToGo<=10000 & msecondstToGo>-6600000){  //5 mins before, 110 mins after start
-																							console.log("****5 MINS BEFORE TILL 30 MINS AFTER START *************")
+																							//console.log("****5 MINS BEFORE TILL 30 MINS AFTER START *************")
 																							scrapeInterval = 10000//timer 10s minutes before match
 																							matchstate == "PLAY"  //set the match state to play 5 minutes before start of match
-																							console.log("scrapeInterval : " + scrapeInterval)
+																							//console.log("scrapeInterval : " + scrapeInterval)
 																					}
 																				}
 																				
 																				if (matchstate == "PLAY"){
-																					console.log("******PLAY********")
+																					//console.log("******PLAY********")
 																					scrapeInterval = 10000  //10s during match
 																				} 
 																				//console.log("scrapeInterval : " + scrapeInterval)
@@ -491,9 +491,11 @@ App {
 									}//it is a valid scrape
 								isFirstRun = false								
 								matchesUpdated()
-var now2 = new Date().getTime()
-var timeStr2 = i18n.dateTime(now2, i18n.time_yes)
-tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
+
+//options to show testtime on tile
+//var now2 = new Date().getTime()
+//var timeStr2 = i18n.dateTime(now2, i18n.time_yes)
+//tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 						}//xhr status = 200
 					}//end of xhr2.readystate
 				}//xhr onreadystate
@@ -511,9 +513,9 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 			oldqmlAnimationURL = animationscreen.qmlAnimationURL
 			oldqmlAnimationText = animationscreen.qmlAnimationText
 			oldstaticImageT1 = animationscreen.staticImageT1
-    		oldstaticImageT2 = animationscreen.staticImageT2
+    			oldstaticImageT2 = animationscreen.staticImageT2
 			oldstaticImageT1dim = animationscreen.staticImageT1dim
-       		oldstaticImageT2dim =animationscreen.staticImageT2dim
+       			oldstaticImageT2dim =animationscreen.staticImageT2dim
 			
 			animationscreen.animationRunning= false
 				
@@ -562,7 +564,7 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 						msg.addArgument("scene",  parseInt(selectedscenebyuuid));
 						bxtClient.sendMsg(msg);
 					}
-					console.log("Blinking started");
+					//console.log("Blinking started");
 					lampblinkTimer.running = true
 					lampTimer.running = true
 				}
@@ -637,9 +639,9 @@ tileButtonInterval = scrapeInterval/1000 + "s from " + timeStr2
 			onTriggered: {
 				var now = new Date().getTime()
 				timeStr = i18n.dateTime(now, i18n.time_yes)
-				console.log("time : " + timeStr)
+				//console.log("time : " + timeStr)
 				if (timeStr == "01:30" || timeStr == "1:30"){  //get new matches at 01:30
-					console.log("Trigger from clock ")
+					//console.log("Trigger from clock ")
 					for(var scrapenumber in matchstates){
 						matchstates[scrapenumber]=""  //clear the matchstates array
 					}

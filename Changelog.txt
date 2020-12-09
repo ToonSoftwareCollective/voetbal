@@ -1,3 +1,6 @@
+1.0.30
+- removed test options and enabled snooze function
+
 1.0.29
 - save current animation and return to old animation after the goal screen has been closed
 
