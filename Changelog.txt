@@ -1,3 +1,20 @@
+1.0.30
+- removed test options and enabled snooze function
+
+1.0.29
+- save current animation and return to old animation after the goal screen has been closed
+
+1.0.28
+- modified timers to have the app not change the timers when the page gives an error
+- check if the page has loaded corrctly before starting the scrape by checking on a pagetext
+
+1.0.27
+- added timers to only speed the request interval during mateched played
+
+1.0.26
+- special seach statement for AZ in CL and EL because of InternAZionale
+- moved snoozevisible to below the http request
+
 1.0.25
 - hiding snooze button when no favourite club/land is in the match list
 

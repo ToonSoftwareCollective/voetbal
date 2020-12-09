@@ -7,7 +7,7 @@ Tile {
 	id: voetbalTile
 	
 	property bool dimState: screenStateController.dimmedColors
-
+	property bool blink:false
 	
 	Component.onCompleted: {
 		app.matchesUpdated.connect(updateMatchesList);
@@ -21,9 +21,6 @@ Tile {
 				if (app.items[i].length > 2) {
 					matchModel.append({match: app.items[i]});
 					statusModel.append({status: app.timestatus[i]});
-					//console.log("app.timestatus[i] (tile): " + app.timestatus[i])
-					//console.log("app.items[i] (tile): " + app.items[i])
-					//console.log("app.showmatchesontile: " + app.showmatchesontile)
 				}
 			}
 		}
@@ -139,9 +136,23 @@ Tile {
 	}
 
 	
+	Rectangle { 
+		id: bulletCircle
+		width: 10 
+		height: 10 
+		anchors {
+			top: parent.top
+			right: parent.right
+			rightMargin: 2
+			topMargin:2
+		}
+		color: (app.scrapeInterval <60000 )? blink? "red" : "transparent" : "transparent"
+		radius: width*0.5 
+	}
+	
 	NewTextLabel {
 		id: snoozeText
-		width: isNxt ? 55 : 45;  
+		width: isNxt ? 55 : 45; 
 		height: isNxt ? 40:32
 		buttonActiveColor: "lightgreen"
 		buttonHoverColor: "blue"
@@ -158,6 +169,9 @@ Tile {
 			app.snooze = !app.snooze
 			if (app.snooze){ snoozeTimer.running = true}
 		}
+//options to show testtime on tile
+//width: parent.width - 4
+//buttonText:  app.tileButtonInterval
 		visible: app.snoozevisible
 	}
 	
@@ -168,6 +182,14 @@ Tile {
 		running: false
 		triggeredOnStart: false
 		onTriggered: {app.snooze = false}
+	}
+	
+	Timer {
+		id: blinkTimer   //interval to scrape data
+		interval:1000
+		repeat: true
+		running: true
+		onTriggered: {blink= !blink}
 	}
 		
 }
