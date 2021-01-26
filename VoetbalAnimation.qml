@@ -75,14 +75,14 @@ Item {
 			radius: 4   
 			Text{
 				id:text1
-				font.pixelSize:  isNxt ? parseInt(2*(parent.width-50)/teams.length):  parseInt(2*(parent.width-65)/teams.length)
+				font.pixelSize:  isNxt ? parseInt(2*(parent.width-50)/(teams.length*1.3)):  parseInt(2*(parent.width-65)/teams.length*1.3)
 				font.family: qfont.regular.name
 				font.bold: true
 				color:  "black" 
 				text: teams
 				anchors {
 					top: parent.top
-					topMargin: isNxt ?  30:24
+					topMargin: isNxt ?  20:16
 					horizontalCenter: parent.horizontalCenter	 		
 				}    		
 			}
@@ -95,7 +95,7 @@ Item {
 				text: scores
 				anchors {
 					top: text1.bottom
-					topMargin: isNxt ? 20:16
+					//topMargin: isNxt ? 16:12
 					horizontalCenter: parent.horizontalCenter	 		
 				}    		
 			}
