@@ -278,11 +278,12 @@ App {
 															var olypointer =competitionblock.toLowerCase().indexOf('>olympische')
 															var clpointer =competitionblock.toLowerCase().indexOf('>uefa cham')
 															var elpointer =competitionblock.toLowerCase().indexOf('>uefa euro')
-
+															var totopointer =competitionblock.toLowerCase().indexOf('>toto knvb-be')
+															
 	//if selected competition is a selected Dutch competition
-															if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1){
+															if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ){
 																	//console.log("competition found today ")
-																	if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ){compmodus = "club"}
+																	if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ){compmodus = "club"}
 																	if (ekpointer>1||wkpointer>1||olypointer>1){compmodus = "land"}
 							
 																	var matches = competitionblock.split('match-row__data')
@@ -360,7 +361,7 @@ App {
 																			
 																			//console.log("matchCLorEL : " + matchCLorEL )
 	//when it is a valid match, do actions
-																			if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 || matchCLorEL){
+																			if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||totopointer>1 || matchCLorEL){
 	//set a new timer for the scraper																			
 																				if (matchstate == "WAITING"){
 																					var hrs =  parseInt(eventtime.substring(0,2))
