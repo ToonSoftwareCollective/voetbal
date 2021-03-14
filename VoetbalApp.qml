@@ -70,6 +70,7 @@ App {
 		property bool 		favscored: false
 		property bool 		scoreOwnLightMode: false
 		property bool		sonosfound: false
+		property bool		matchJustEnded: false
 		
 		property bool 		snoozevisible: false
 		property bool 		snooze: false
@@ -394,6 +395,14 @@ App {
 																				items[matchnumber] = homeplayer + " " + homescore  + "-" + outscore + " " + outplayer
 																				showmatchesontile = true
 																				timestatus[matchnumber] = eventtime
+																				
+	//match just ended?						
+																				if (matchstates[matchnumber] == "PLAY" && matchstate == "END" ){
+																					matchJustEnded = true
+																				}else{
+																					matchJustEnded = false
+																				}
+
 																				matchstates[matchnumber] = matchstate
 
 	//calculate the fontsize for the tile
@@ -433,7 +442,7 @@ App {
 																				
 																				//console.log( homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																					
-																				if ((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)){   //new goal scored this match
+																				if (((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)) || matchJustEnded){   //new goal scored this match
 																					if ((oldhomescore[matchnumber] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
 																						scoringTeam = homeplayer
 																					}
@@ -458,16 +467,23 @@ App {
 																							if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 0){
 	//goal fell in a match where one of the favourite clubs is playing
 	//SPECIAL ACTION WHEN GOAL HERE!!!!!!
-
-																								isInNotificationMode = true																							
+																								isInNotificationMode = true																									
 	//BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION				
-																								createScreenNotification(homeplayer, outplayer, homescore, outscore)
-																								if (!snooze){
-																									blinkLamps()
-																									try{
-																										tscsignals.tscSignal("sonos", "Nieuwe tussenstand bij " + homeplayer + ' tegen ' + outplayer + ', het staat nu ' + homescore + ' ' + outscore);
-																									} catch(e) {
+																								if (!matchJustEnded){
+																									createScreenNotification(homeplayer, outplayer, homescore, outscore)
+																									if (!snooze){
+																										blinkLamps()
+																										try{
+																											tscsignals.tscSignal("sonos", "Nieuwe tussenstand bij " + homeplayer + ' tegen ' + outplayer + ', het staat nu ' + homescore + ' ' + outscore);
+																										} catch(e) {
+																										}
 																									}
+																								}else{
+																									try{
+																											tscsignals.tscSignal("sonos", "Eindstand " + homeplayer + ' tegen ' + outplayer + ', is geworden ' + homescore + ' ' + outscore);
+																										} catch(e) {
+																										}
+																									matchJustEnded = false
 																								}
 																								
 																								break;

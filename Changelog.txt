@@ -1,3 +1,6 @@
+1.0.33
+- sonos integration of match end score
+
 1.0.32
 - aaded Toto KNVB Beker
 

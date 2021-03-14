@@ -118,7 +118,7 @@ Screen {
 			app.showmatchesontile = false
 			console.log("clicked demo mode")
 		}
-		visible:false //DELETE THIS to enable demo mode
+		//visible:false //DELETE THIS to enable demo mode
 	}
 
 	Text{
