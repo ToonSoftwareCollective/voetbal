@@ -1,3 +1,6 @@
+1.0.34
+- sonos integration of game start
+
 1.0.33
 - sonos integration of match end score
 
