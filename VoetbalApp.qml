@@ -70,6 +70,7 @@ App {
 		property bool 		favscored: false
 		property bool 		scoreOwnLightMode: false
 		property bool		sonosfound: false
+		property bool       goalscored: false
 		property bool		matchJustEnded: false
 		property bool       matchJustStarted: false
 		
@@ -448,8 +449,15 @@ App {
 																				//console.log("(oldscoretotal[matchnumber] : "  + oldscoretotal[matchnumber])
 																				
 																				//console.log( homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+																				
+																				if ((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0)){
+																					goalscored=true
+																				}else{
+																					goalscored=false
+																				}
+																				
 																					
-																				if (((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)) || matchJustEnded || matchJustStarted){   //new goal scored this match
+																				if ((goalscored || matchJustEnded || matchJustStarted) && !isInNotificationMode){   //notification wanted
 																					if ((oldhomescore[matchnumber] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
 																						scoringTeam = homeplayer
 																					}
@@ -487,7 +495,8 @@ App {
 																									matchJustEnded = false
 																								
 																								}
-																								else if (matchJustStarted){
+																								
+																								if (matchJustStarted){
 																									try{	
 																											//console.log("voetbal BEGIN!!!!!!!!!!!!!!!!!!!!!!!!: ")
 																											//console.log("De voetbalwedstrijd " + homeplayer + ' tegen ' + outplayer + ' is begonnen')
@@ -497,7 +506,8 @@ App {
 																										}
 																									matchJustStarted = false
 																								}
-																								else{
+																								
+																								if (goalscored){
 																									createScreenNotification(homeplayer, outplayer, homescore, outscore)
 																									if (!snooze){
 																										blinkLamps()
@@ -506,10 +516,8 @@ App {
 																										} catch(e) {
 																										}
 																									}
-																				
+																									goalscored = false
 																								}
-																								
-																								break;
 																								
 																							}//match of team fav in new score match
 																						}//for each teamsarray
