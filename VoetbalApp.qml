@@ -71,6 +71,7 @@ App {
 		property bool 		scoreOwnLightMode: false
 		property bool		sonosfound: false
 		property bool		matchJustEnded: false
+		property bool       matchJustStarted: false
 		
 		property bool 		snoozevisible: false
 		property bool 		snooze: false
@@ -396,7 +397,13 @@ App {
 																				showmatchesontile = true
 																				timestatus[matchnumber] = eventtime
 																				
-	//match just ended?						
+	//match just started?						
+																				if (matchstates[matchnumber] == "WAITING" && matchstate == "PLAY" ){
+																					matchJustStarted = true
+																				}else{
+																					matchJustStarted = false
+																				}
+	//match just ended?																				
 																				if (matchstates[matchnumber] == "PLAY" && matchstate == "END" ){
 																					matchJustEnded = true
 																				}else{
@@ -442,7 +449,7 @@ App {
 																				
 																				//console.log( homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 																					
-																				if (((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)) || matchJustEnded){   //new goal scored this match
+																				if (((oldscoretotal[matchnumber] != newscoretotal) && (newscoretotal>0) && (!isInNotificationMode)) || matchJustEnded || matchJustStarted){   //new goal scored this match
 																					if ((oldhomescore[matchnumber] != homescore) && (homescore>0)){ //new goal scored this match by homeplayer
 																						scoringTeam = homeplayer
 																					}
@@ -469,7 +476,28 @@ App {
 	//SPECIAL ACTION WHEN GOAL HERE!!!!!!
 																								isInNotificationMode = true																									
 	//BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION				
-																								if (!matchJustEnded){
+																								if (matchJustEnded){
+																									try{	
+																											//console.log("voetbal EINDSTAND!!!!!!!!!!!!!!!!!!!!!!!!: ")
+																											//console.log("Eindstand " + homeplayer + ' tegen ' + outplayer + ', is geworden ' + homescore + ' ' + outscore)
+																											//console.log("voetbal EINDSTAND!!!!!!!!!!!!!!!!!!!!!!!!: ")
+																											tscsignals.tscSignal("sonos", "Eindstand " + homeplayer + ' tegen ' + outplayer + ', is geworden ' + homescore + ' ' + outscore);
+																										} catch(e) {
+																										}
+																									matchJustEnded = false
+																								
+																								}
+																								else if (matchJustStarted){
+																									try{	
+																											//console.log("voetbal BEGIN!!!!!!!!!!!!!!!!!!!!!!!!: ")
+																											//console.log("De voetbalwedstrijd " + homeplayer + ' tegen ' + outplayer + ' is begonnen')
+																											//console.log("voetbal BEGIN!!!!!!!!!!!!!!!!!!!!!!!!: ")
+																											tscsignals.tscSignal("sonos", "De voetbalwedstrijd " + homeplayer + ' tegen ' + outplayer + ' is begonnen')
+																										} catch(e) {
+																										}
+																									matchJustStarted = false
+																								}
+																								else{
 																									createScreenNotification(homeplayer, outplayer, homescore, outscore)
 																									if (!snooze){
 																										blinkLamps()
@@ -478,12 +506,7 @@ App {
 																										} catch(e) {
 																										}
 																									}
-																								}else{
-																									try{
-																											tscsignals.tscSignal("sonos", "Eindstand " + homeplayer + ' tegen ' + outplayer + ', is geworden ' + homescore + ' ' + outscore);
-																										} catch(e) {
-																										}
-																									matchJustEnded = false
+																				
 																								}
 																								
 																								break;
@@ -536,7 +559,7 @@ App {
 			
 			animationscreen.animationRunning= false
 				
-			console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
+			//console.log(" voetbal START To Write Notification: " + homeplayer + " " + homescore  + "-" + outscore + " " + outplayer)
 			var setJson = {
 				"teams" : homeplayer + " - " + outplayer,
 				"score" : homescore + " - " + outscore
