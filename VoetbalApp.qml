@@ -305,17 +305,30 @@ App {
 																			var n102 = matches[i].indexOf('</',n101)
 																			var eventstatus = matches[i].substring(n101, n102)																	
 
-																			//console.log("eventstatus :  "  + eventstatus)
 
 																			var n1 = matches[i].indexOf('match-row__date') + 17
+				
+
+																			if (matches[i].indexOf('CET')){
+																				var n2 = matches[i].indexOf('(', n1) + 1
+																				var n3 = matches[i].indexOf('CET',n2)
+																				var eventdate = matches[i].substring(n1, n2)
+																				var vday = eventdate.substring(0, 2)
+																				var vmonth = eventdate.substring(3, 6)
+																				var vyear = eventdate.substring(6, 8)
+																				var eventtime = matches[i].substring(n2, n3)
+																			}
 																			
-																			var n2 = matches[i].indexOf('(', n1) + 1
-																			var n3 = matches[i].indexOf('CET',n2)
-																			var eventdate = matches[i].substring(n1, n2)
-																			var vday = eventdate.substring(0, 2)
-																			var vmonth = eventdate.substring(3, 6)
-																			var vyear = eventdate.substring(6, 8)
-																			var eventtime = matches[i].substring(n2, n3)
+																			if (matches[i].indexOf('CEST')){
+																				var n2 = matches[i].indexOf('(', n1) + 1
+																				var n3 = matches[i].indexOf('CEST',n2)
+																				var eventdate = matches[i].substring(n1, n2)
+																				var vday = eventdate.substring(0, 2)
+																				var vmonth = eventdate.substring(3, 6)
+																				var vyear = eventdate.substring(6, 8)
+																				var eventtime = matches[i].substring(n2, n3)
+																			}
+																			
 																																				
 																			matchstate = "WAITING"																		
 																			if (eventstatus === "ES") {eventtime = "einde" ; matchstate = "END"}
