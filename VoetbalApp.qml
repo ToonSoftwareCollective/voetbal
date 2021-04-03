@@ -494,8 +494,7 @@ App {
 																							//console.log("combi team: " + combiteam)
 																							if((combiteam.indexOf(teamcheck) != -1)  && teamcheck.length > 0){
 	//goal fell in a match where one of the favourite clubs is playing
-	//SPECIAL ACTION WHEN GOAL HERE!!!!!!
-																								isInNotificationMode = true																									
+	//SPECIAL ACTION WHEN GOAL HERE!!!!!!																							
 	//BLINK LAMPS, CREATE SCREEN NOTIFICATION AND SONOS INTEGRATION				
 																								if (matchJustEnded){
 																									try{	
@@ -521,6 +520,7 @@ App {
 																								}
 																								
 																								if (goalscored){
+																									isInNotificationMode = true
 																									createScreenNotification(homeplayer, outplayer, homescore, outscore)
 																									if (!snooze){
 																										blinkLamps()
