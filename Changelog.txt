@@ -1,3 +1,6 @@
+1.0.36
+- summer time integration
+
 1.0.35
 - sonos integration of game start try 2
 
