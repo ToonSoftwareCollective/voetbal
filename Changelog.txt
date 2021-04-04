@@ -1,5 +1,5 @@
 1.0.37
-- mionor fault corrected
+- minor fault corrected
 
 1.0.36
 - summer time integration
