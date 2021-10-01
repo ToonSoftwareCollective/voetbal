@@ -333,19 +333,19 @@ App {
 																						var outplayer = matches[i].substring(n32, n33).trim()
 																						//console.log("outplayer :  "  + outplayer)
 																						
+																						var n40 = matches[i].indexOf('<span class=\"c-tijd\">') + '<span class=\"c-tijd\">'.length
+																						var n41 = matches[i].indexOf('</span>',n40)
+																						var matchTime = matches[i].substring(n40, n41).trim()
+																						//console.log("matchTime :  "  + matchTime)
+																						
 																						var n10 = matches[i].indexOf('class=\"c-uitslag\"') + 'class=\"c-uitslag\"'.length
 																						var n11 = matches[i].indexOf('<a href=\"wedstrijd.asp',n10) + '<a href=\"wedstrijd.asp'.length
 																						var n12 = matches[i].indexOf('\">',n11) + '\">'.length
 																						var n13 = matches[i].indexOf('</a>',n12)
 																						var score = matches[i].substring(n12, n13).trim()
 																						//console.log("score :  "  + score)
-																						
-																						var n40 = matches[i].indexOf('<span class=\"c-tijd\">') + '<span class=\"c-tijd\">'.length
-																						var n41 = matches[i].indexOf('</span>',n40)
-																						var matchTime = matches[i].substring(n40, n41).trim()
-																						//console.log("matchTime :  "  + matchTime)
-																						
-																						matchstate = "WAITING"	
+
+																						matchstate = "WAITING"
 																						if(score=="-"){
 																							matchstate = "WAITING"
 																							var homescore = " "																						
@@ -353,14 +353,20 @@ App {
 																						}else{
 																							if (matches[i].indexOf('<div class="fading">')>-1){
 																								matchstate = "PLAY"
+																								// <div class="fading">1 - 0</div>
+
+																								var n51 = score.indexOf('<div class=\"fading\">') + '<div class=\"fading\">'.length
+																								var n52 = score.indexOf('<', n51)
+																								var score = score.substring(n51,n52).trim()
+																								
 																							}else{
 																								matchstate = "END"
 																							}
 																							var scoreArray = score.split("-")
-																							var homescore = scoreArray[0].trim()
+																							var homescore = parseInt(scoreArray[0].trim())
 																							//console.log("homescore :  "  + homescore)																						
-																							var outscore = scoreArray[1].trim()	
-																							console.log("outscore :  "  + outscore)	
+																							var outscore = parseInt(scoreArray[1].trim())	
+																							//console.log("outscore :  "  + outscore)	
 																						}
 																						
 //only add CL and EL matches when they are teams playing in the Dutch Competition																
@@ -439,15 +445,20 @@ App {
 																							}
 
 																							matchstates[matchnumber] = matchstate
-
-//calculate the fontsize for the tile
+//calculate the fontsize for the tile													
 																							var calculatedfontzize = isNxt? parseInt(520/(items[matchnumber].length + 5)):parseInt(400/(items[matchnumber].length + 5))
+																							//console.log("items[matchnumber] : " + items[matchnumber])
+																							//console.log("items[matchnumber].length : " + items[matchnumber].length)
+																							
 																							//console.log("calculatedfontzize : " + calculatedfontzize)
+																							//console.log("sizeoftilefont : " + sizeoftilefont)
+																							
 																							if (isNxt & sizeoftilefont>17) {sizeoftilefont = 17}
 																							if (!isNxt & sizeoftilefont<13) {sizeoftilefont = 13}
 																							if (sizeoftilefont > calculatedfontzize){
 																								sizeoftilefont=calculatedfontzize
-																							}	
+																							}
+																							//console.log("sizeoftilefont : " + sizeoftilefont)																							
 
 //clubcompetition or landcompetion?		
 																							if (compmodus == "club"){
