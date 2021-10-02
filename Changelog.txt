@@ -1,5 +1,6 @@
-1.1.0
-- change to voetbalzone.nl
+1.1.1
+- New code. Now plugins per scraper. Scrapers for ad.nl and voetbalzone added
+
 
 1.0.37
 - minor fault corrected
