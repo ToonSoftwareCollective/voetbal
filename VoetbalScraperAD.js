@@ -229,6 +229,10 @@ Wachten op wedstrijd
 																	matchstate = "PLAY"
 																	eventtime = timeDescr
 																	//console.log("Playing")
+																}else if{
+																	(matches[i].indexOf('RUST')>-1){
+																	matchstate = "PLAY"
+																	eventtime = "rust"
 																}else{
 																	matchstate = "END"
 																	eventtime = "einde"
