@@ -9,8 +9,22 @@ Screen {
 	
 	
 	onShown: {
+		addCustomTopRightButton("Opslaan")
 		getLamps()
+		console.log("app.scraperChoice: " + app.scraperChoice )
+		if (app.scraperChoice == "AD"){
+			scrapeModeToggle.isSwitchedOn = false;
+		}
+		if (app.scraperChoice == "VZ"){
+			scrapeModeToggle.isSwitchedOn = true;
+		}
 	}
+	
+	onCustomButtonClicked: {
+		app.saveSettings()
+		hide()
+	}
+	
 	
 	function getLamps(){
 		bridgefound=false
@@ -102,6 +116,52 @@ Screen {
 			onClicked: {stage.openFullscreen(app.voetbalConfigScreenUrl3)}	
 		}
 		visible: bridgefound
+	}
+	
+
+
+	OnOffToggle {
+		id: scrapeModeToggle
+		height:  30
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: setupText3.bottom
+			topMargin: isNxt ? 20:16
+		}
+		leftIsSwitchedOn: false
+		onSelectedChangedByUser: {
+			if (isSwitchedOn) {
+				app.scraperChoice = "VZ";
+				app.scraperUrl = app.scraperUrlVZ
+			} else {
+				app.scraperChoice = "AD";
+				app.scraperUrl = app.scraperUrlAD
+			}
+		}
+	}
+	
+	Text {
+		id: adMode
+		text: "scrapen van AD.nl "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			right: scrapeModeToggle.left
+			top: scrapeModeToggle.bottom
+		}
+	}
+	
+	Text {
+		id: vzMode
+		text: "scrapen van voetbalzone.nl "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			left: scrapeModeToggle.right
+			top: scrapeModeToggle.bottom
+		}
 	}
 	
 	MouseArea {
