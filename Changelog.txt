@@ -1,4 +1,4 @@
-1.1.1
+1.1.2
 - New code. Now plugins per scraper. Scrapers for ad.nl and voetbalzone added
 
 
