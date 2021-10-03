@@ -227,7 +227,7 @@ Wachten op wedstrijd
 															}else{
 																if (matches[i].indexOf('&#')>-1){
 																	matchstate = "PLAY"
-																	eventtime = timeDescr
+																	eventtime = timeDescr + "'"
 																	//console.log("Playing")
 																}else if(matches[i].indexOf('RUST')>-1){
 																	matchstate = "PLAY"
