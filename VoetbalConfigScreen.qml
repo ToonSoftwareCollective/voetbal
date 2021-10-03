@@ -9,21 +9,22 @@ Screen {
 	
 	
 	onShown: {
-		addCustomTopRightButton("Opslaan")
+		//addCustomTopRightButton("Opslaan")
 		getLamps()
-		console.log("app.scraperChoice: " + app.scraperChoice )
+/*		console.log("app.scraperChoice: " + app.scraperChoice )
 		if (app.scraperChoice == "AD"){
 			scrapeModeToggle.isSwitchedOn = false;
 		}
 		if (app.scraperChoice == "VZ"){
 			scrapeModeToggle.isSwitchedOn = true;
 		}
+*/
 	}
 	
-	onCustomButtonClicked: {
-		app.saveSettings()
-		hide()
-	}
+//	onCustomButtonClicked: {
+//		app.saveSettings()
+//		hide()
+//	}
 	
 	
 	function getLamps(){
@@ -138,6 +139,7 @@ Screen {
 				app.scraperUrl = app.scraperUrlAD
 			}
 		}
+		visible:false //DELETE THIS to enable multi scraper Mode
 	}
 	
 	Text {
@@ -150,6 +152,8 @@ Screen {
 			right: scrapeModeToggle.left
 			top: scrapeModeToggle.bottom
 		}
+		visible:false //DELETE THIS to enable multi scraper Mode
+
 	}
 	
 	Text {
@@ -162,7 +166,10 @@ Screen {
 			left: scrapeModeToggle.right
 			top: scrapeModeToggle.bottom
 		}
+		visible:false //DELETE THIS to enable multi scraper Mode
+
 	}
+
 	
 	MouseArea {
 		height : 80
