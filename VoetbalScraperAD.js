@@ -74,9 +74,10 @@ function getURL(selectedUrl) {
 												//console.log("competitionblock :  "  + competitionblock)
 												found = 2
 												var eredivipointer = competitionblock.toLowerCase().indexOf('eredivisie') 
-												//var eredivipointer = competitionblock.toLowerCase().indexOf('premier') 
+												//var eredivipointer = competitionblock.toLowerCase().indexOf('primera') 
 												var ekpointer =competitionblock.toLowerCase().indexOf('europees') 
 												var wkpointer =competitionblock.toLowerCase().indexOf('wereldkamp') 
+												var confpointer =competitionblock.toLowerCase().indexOf('conference')
 												var olypointer =competitionblock.toLowerCase().indexOf('olympische')
 												var clpointer =competitionblock.toLowerCase().indexOf('champions league')
 												var elpointer =competitionblock.toLowerCase().indexOf('europa league')
@@ -84,9 +85,9 @@ function getURL(selectedUrl) {
 												var keukenpointer =competitionblock.toLowerCase().indexOf('keuken kampioen')
 												
 //if selected competition is a selected Dutch competition
-												if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ){
+												if (eredivipointer>1||ekpointer>1||wkpointer>1||olypointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ||confpointer>1 ){
 													//console.log("competition found today ! ")
-													if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ){compmodus = "club"}
+													if (eredivipointer>1 ||clpointer>1 ||elpointer>1 ||totopointer>1 ||confpointer>1){compmodus = "club"}
 													if (ekpointer>1||wkpointer>1||olypointer>1){compmodus = "land"}
 		
 //for each match in the competition
@@ -246,7 +247,7 @@ Wachten op wedstrijd
 															
 															
 //only add CL and EL matches when they are teams playing in the Dutch Competition																
-															if (clpointer>-1 || elpointer>-1){
+															if (clpointer>-1 || elpointer>-1 ||confpointer>1){
 																var combiteam = homeplayer + outplayer
 																combiteam = combiteam.toLowerCase()
 																var teamsCLandELarray = teamsCLandEL.split(';')
