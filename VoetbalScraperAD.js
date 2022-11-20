@@ -76,7 +76,7 @@ function getURL(selectedUrl) {
 												var eredivipointer = competitionblock.toLowerCase().indexOf('eredivisie') 
 												//var eredivipointer = competitionblock.toLowerCase().indexOf('primera') 
 												var ekpointer =competitionblock.toLowerCase().indexOf('europees') 
-												var wkpointer =competitionblock.toLowerCase().indexOf('wereldkamp') 
+												var wkpointer =competitionblock.toLowerCase().indexOf('wk voetbal') 
 												var confpointer =competitionblock.toLowerCase().indexOf('conference')
 												var olypointer =competitionblock.toLowerCase().indexOf('olympische')
 												var clpointer =competitionblock.toLowerCase().indexOf('champions league')
