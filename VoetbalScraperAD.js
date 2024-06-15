@@ -18,15 +18,15 @@ function getFirstURL(selectedUrl) {
 }
 
 function getURL(selectedUrl) {
-	//console.log("getURL")	
-	//console.log("selectedUrl : " + selectedUrl)	
+	//console.log("************* voetbal: getURL")	
+	//console.log("************* voetbal:selectedUrl : " + selectedUrl)	
 	var xhr2 = new XMLHttpRequest();
 	xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 	xhr2.onreadystatechange = function() {
 		if (xhr2.readyState == XMLHttpRequest.DONE) {
 			if (xhr2.status == 200) {
-						//console.log("XHR READY :  ")
-						//console.log("voetbal responsetext :  "  + xhr2.responseText)
+						//console.log("************* voetbal:XHR READY :  ")
+						//console.log("************* voetbal:voetbal responsetext :  "  + xhr2.responseText)
 						
 //check if it is a valid url and if the page load has succeeded									
 						//ad.nl
@@ -52,30 +52,30 @@ function getURL(selectedUrl) {
 							for(var scrapenumber in matchstates){
 								if (matchstates[scrapenumber]==="PLAY"){
 									scrapeInterval = 10000
-									//console.log("a match is still playing so interval is short ")
+									//console.log("************* voetbal: a match is still playing so interval is short ")
 								}
 							}
 							//console.log("scrapeInterval : " + scrapeInterval + "  current time : " + timeStr)
 
 //Check from the response if there are any competitions
-							//var n201 = xhr2.responseText.indexOf('<div class=\"sportcenter__holder\">')
+							var n201 = xhr2.responseText.indexOf('<div class=\"sportcenter__holder\">')
 							var n201 = xhr2.responseText.indexOf('<div class=\"sportcenter__match-table\">')
-							//console.log("n201 : " + n201 )
+							//console.log("************* voetbal:n201 : " + n201 )
 							var n202 = xhr2.responseText.indexOf('<footer class=\"page-main-footer\"',n201)
-							//console.log("n202 : " + n202 )
+							//console.log("************* voetbal:n202 : " + n202 )
 							var allmatches = xhr2.responseText.substring(n201, n202)
-							//console.log("allmatches : " + allmatches )
+							//console.log("************* voetbal:allmatches : " + allmatches )
 							var compwrapperarray = allmatches.split('<div class=\"sportcenter__match-table\">')
-							//console.log("compwrapperarray.length: " + compwrapperarray.length)
+							//console.log("************* voetbal:compwrapperarray.length: " + compwrapperarray.length)
 
 //for each competion
 							for(var competitioncount in compwrapperarray){								
 												var competitionblock = compwrapperarray[competitioncount]
-												//console.log("competitionblock :  "  + competitionblock)
+												//console.log("************* voetbal:competitionblock :  "  + competitionblock)
 												found = 2
 												var eredivipointer = competitionblock.toLowerCase().indexOf('eredivisie') 
-												//var eredivipointer = competitionblock.toLowerCase().indexOf('primera') 
-												var ekpointer =competitionblock.toLowerCase().indexOf('europees') 
+												var eredivipointer = competitionblock.toLowerCase().indexOf('primera') 
+												var ekpointer =competitionblock.toLowerCase().indexOf('euro ') 
 												var wkpointer =competitionblock.toLowerCase().indexOf('wk voetbal') 
 												var confpointer =competitionblock.toLowerCase().indexOf('conference')
 												var olypointer =competitionblock.toLowerCase().indexOf('olympische')
@@ -94,8 +94,8 @@ function getURL(selectedUrl) {
 													var matches = competitionblock.split('<a class=\"sportcenter__match-item link')
 													for(var i in matches){
 													    //console.log(matches[i])
-														//found = matches[i].indexOf('sportcenter__match-item')
-														//found = 2
+														found = matches[i].indexOf('sportcenter__match-item')
+														found = 2
 														if (matches[i].indexOf('sportcenter__match-item')>-1){
 															//console.log("sportcenter__match-item found ")
 															if (matchnumber>9){matchnumber = 9}
@@ -213,30 +213,30 @@ Wachten op wedstrijd
 															//homescore = "0"
 															//outscore =  "0"
 															
-															//console.log("homeplayer :  "  + homeplayer)
-															//console.log("outplayer :  "  + outplayer)
-															//console.log("matchTime :  "  + matchTime)
-															//console.log("score :  "  + score)
-															//console.log("timeDescr :  "  + timeDescr)
+															console.log("homeplayer :  "  + homeplayer)
+															console.log("outplayer :  "  + outplayer)
+															console.log("matchTime :  "  + matchTime)
+															console.log("score :  "  + score)
+															console.log("timeDescr :  "  + timeDescr)
 															
 															
 															if(score=="999-999" & eventtime.length>1){
 																matchstate = "WAITING"
 																homescore = " "																						
 																outscore = " "
-																//console.log("Waiting")
+																console.log("Waiting")
 															}else{
 																if (matches[i].indexOf('&#')>-1){
 																	matchstate = "PLAY"
 																	eventtime = timeDescr + "'"
-																	//console.log("Playing")
+																	console.log("Playing")
 																}else if(matches[i].indexOf('RUST')>-1){
 																	matchstate = "PLAY"
 																	eventtime = "rust"
 																}else{
 																	matchstate = "END"
 																	eventtime = "einde"
-																	//console.log("Ended")
+																	console.log("Ended")
 																}
 																var scoreArray = score.split("-")
 																homescore = parseInt(scoreArray[0].trim())
