@@ -1,3 +1,9 @@
+1.1.7
+- voetbalzone.nl scraper rewritten for the new website (https://www.voetbalzone.nl/actuele-wedstrijden)
+- ad.nl shows a cookie consent page instead of the matches; a saved "AD" setting is ignored and voetbalzone.nl is used
+- voetbalzone.nl is the default source
+- removed double scrape (VZ scraper was also started when AD was selected)
+
 1.1.6
 -Change in EK
 

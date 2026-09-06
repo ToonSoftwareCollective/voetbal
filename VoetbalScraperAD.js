@@ -3,13 +3,15 @@ function getFirstURL(selectedUrl) {
 	var xhr2 = new XMLHttpRequest();
 	xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
 	xhr2.onreadystatechange = function() {
-	console.log(xhr2.readyState)		
 		if (xhr2.readyState == XMLHttpRequest.DONE) {
-		console.log(xhr2.status)		
 			if (xhr2.status == 200) {
 						//console.log("XHR READY :  ")
 						//console.log("voetbal responsetext :  "  + xhr2.responseText)
 						getData()
+			} else {
+						//ad.nl not reachable from the Toon: use voetbalzone.nl instead
+						console.log("voetbal: ad.nl request failed (status " + xhr2.status + "), switching to voetbalzone.nl")
+						switchToVZ()
 			}
 		}
 
@@ -17,8 +19,15 @@ function getFirstURL(selectedUrl) {
 	xhr2.send()
 }
 
+//09-2026: ad.nl serves a cookie consent page (or is not reachable at all from the Toon), switch to voetbalzone.nl
+function switchToVZ() {
+	scraperChoice = "VZ"
+	scraperUrl = scraperUrlVZ
+	getData()
+}
+
 function getURL(selectedUrl) {
-	//console.log("************* voetbal: getURL")	
+	//console.log("************* voetbal: getURL")
 	//console.log("************* voetbal:selectedUrl : " + selectedUrl)	
 	var xhr2 = new XMLHttpRequest();
 	xhr2.open("GET", selectedUrl, true); //check the feeds from the webpage
@@ -30,6 +39,14 @@ function getURL(selectedUrl) {
 						
 //check if it is a valid url and if the page load has succeeded									
 						//ad.nl
+//09-2026: ad.nl serves a cookie consent page (DPG Media privacy gate) instead of the match data.
+//The Toon cannot accept that consent, so switch to the voetbalzone scraper for the rest of this session
+						if (xhr2.responseText.indexOf('privacy-gate') > -1 || xhr2.responseText.indexOf('sportcenter__match') < 0){
+							console.log("voetbal: ad.nl gives no match data (privacy gate), switching to voetbalzone.nl")
+							switchToVZ()
+							return
+						}
+
 						if(xhr2.responseText.toLowerCase().indexOf("ad.nl") > -1){
 
 //Reset match vars when a new scrape is starting

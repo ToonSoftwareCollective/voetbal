@@ -26,8 +26,8 @@ App {
 		property url 		voetbalConfigScreenUrl4 : "VoetbalConfigScreen4.qml"
 		
 		property url 		scraperUrlAD : "https://www.ad.nl/voetbalcenter/live"
-		property url 		scraperUrlVZ : "https://www.voetbalzone.nl/actuele_wedstrijden.asp"
-		property url		scraperUrl : scraperUrlAD
+		property url 		scraperUrlVZ : "https://www.voetbalzone.nl/actuele-wedstrijden"
+		property url		scraperUrl : scraperUrlVZ
 		
 
 		//property url 		scraperUrl :"http://localhost/tsc/competitie.html"
@@ -55,7 +55,8 @@ App {
 		property  string    selectedscenebyname  : ""
 		property  string 	bridgeuuid
 		
-		property string 	scraperChoice : "AD"
+		//AD = ad.nl (behind a cookie consent page since 2026, falls back to VZ automatically), VZ = voetbalzone.nl
+		property string 	scraperChoice : "VZ"
 
 		
 		property  string	scoringTeam : ""
@@ -128,7 +129,7 @@ App {
 			'SceneUUID': "",
 			'SceneName': "",
 			'scoreOwnLightMode': "",
-			'scraperChoice': "AD"
+			'scraperChoice': "VZ"
 		}
 		property bool lampstate: false
 
@@ -166,19 +167,16 @@ App {
 			try {
 				voetbalSettingsJson = JSON.parse(voetbalSettingsFile.read())
 				scraperChoice =  voetbalSettingsJson['scraperChoice']
-				
-				if (scraperChoice == "AD"){
-					scraperUrl = scraperUrlAD
-				}
-				if (scraperChoice == "VZ"){
-					scraperUrl = scraperUrlVZ
-				}
-				
 			} catch(e) {
-				scraperChoice = "AD"
-				scraperUrl = scraperUrlAD
-				//console.log ("1-1 " + scraperUrl);
+				scraperChoice = "VZ"
 			}
+
+			//09-2026: ad.nl only serves a cookie consent page, so a saved "AD" setting is always replaced by voetbalzone.nl
+			if (scraperChoice == "AD"){
+				console.log("voetbal: ad.nl is no longer usable as source, using voetbalzone.nl instead")
+			}
+			scraperChoice = "VZ"
+			scraperUrl = scraperUrlVZ
 			
 			checkSonos()
 			console.log ("2 " + scraperUrl);
@@ -260,8 +258,6 @@ App {
 			if (scraperChoice == "VZ"){
 				VZ.getURL(selectedUrl)
 			}
-			VZ.getURL(selectedUrl)
-
 		}
 		
 		function doTakeActions(){
