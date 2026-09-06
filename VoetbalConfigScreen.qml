@@ -9,8 +9,23 @@ Screen {
 	
 	
 	onShown: {
+		//addCustomTopRightButton("Opslaan")
 		getLamps()
+/*		console.log("app.scraperChoice: " + app.scraperChoice )
+		if (app.scraperChoice == "AD"){
+			scrapeModeToggle.isSwitchedOn = false;
+		}
+		if (app.scraperChoice == "VZ"){
+			scrapeModeToggle.isSwitchedOn = true;
+		}
+*/
 	}
+	
+//	onCustomButtonClicked: {
+//		app.saveSettings()
+//		hide()
+//	}
+	
 	
 	function getLamps(){
 		bridgefound=false
@@ -103,6 +118,58 @@ Screen {
 		}
 		visible: bridgefound
 	}
+	
+
+
+	OnOffToggle {
+		id: scrapeModeToggle
+		height:  30
+		anchors {
+			horizontalCenter: parent.horizontalCenter
+			top: setupText3.bottom
+			topMargin: isNxt ? 20:16
+		}
+		leftIsSwitchedOn: false
+		onSelectedChangedByUser: {
+			if (isSwitchedOn) {
+				app.scraperChoice = "VZ";
+				app.scraperUrl = app.scraperUrlVZ
+			} else {
+				app.scraperChoice = "AD";
+				app.scraperUrl = app.scraperUrlAD
+			}
+		}
+		visible:false //DELETE THIS to enable multi scraper Mode
+	}
+	
+	Text {
+		id: adMode
+		text: "scrapen van AD.nl "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			right: scrapeModeToggle.left
+			top: scrapeModeToggle.bottom
+		}
+		visible:false //DELETE THIS to enable multi scraper Mode
+
+	}
+	
+	Text {
+		id: vzMode
+		text: "scrapen van voetbalzone.nl "
+		font.pixelSize:  isNxt ? 18:14
+		font.family: qfont.semiBold.name
+
+		anchors {
+			left: scrapeModeToggle.right
+			top: scrapeModeToggle.bottom
+		}
+		visible:false //DELETE THIS to enable multi scraper Mode
+
+	}
+
 	
 	MouseArea {
 		height : 80

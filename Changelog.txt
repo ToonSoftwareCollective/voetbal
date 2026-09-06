@@ -1,3 +1,34 @@
+1.1.7
+- voetbalzone.nl scraper rewritten for the new website (https://www.voetbalzone.nl/actuele-wedstrijden)
+- ad.nl shows a cookie consent page instead of the matches; a saved "AD" setting is ignored and voetbalzone.nl is used
+- voetbalzone.nl is the default source
+- removed double scrape (VZ scraper was also started when AD was selected)
+
+1.1.6
+-Change in EK
+
+1.1.5
+-Change in WK
+
+1.1.4
+-Conference league added
+
+1.1.3
+- New code. Scraper for ad.nl
+
+
+1.0.37
+- minor fault corrected
+
+1.0.36
+- summer time integration
+
+1.0.35
+- sonos integration of game start try 2
+
+1.0.34
+- sonos integration of game start
+
 1.0.33
 - sonos integration of match end score
 
